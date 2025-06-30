@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title> Admin Menu </title>
+    <title> Admin Promotions </title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,32 +25,43 @@
       <div class="right-section"> 
         <button class="home-button"> Home</button>
         <button class="account-button"> Account</button>
-        <button class="menu-button"> Menu</button>  
+        <button class="menu-button"onclick="location.href='../admin-menu-edit/edit-admin.html'">Menu</button>  
       </div>
     </div>
 
     <div class="page">
-      <p class="bookstore-title">Menu</p>
+      <p class="bookstore-title">Add/edit</p>
     </div>
 
     <div class="body">
-      <div class="manage-books">
-        <button class="manage-books-button" onclick="location.href='../admin-add-edit/add-edit-admin.html'">
-          <p>Manage Books</p>
-        </button>
+
+      <div class="image">
+        <p class="title">Promotion</p>
+        <img class="percent-img" src="imgs/download.jpg">
+
       </div>
 
-      <div class="manage-users"> 
-        <button class="manage-users-button" onclick="location.href='../admin-users-edit/admin-edit-users.html'">
-          <p>Manage Users</p>
-        </button>
+      <div class="promotion-info">
+        
+        <p class="percent-amount"> Percent: </p>
+          <input class="percent-bar" type="text"
+          placeholder="Percent ex. 40 or .4">
+        
+
+        <p class="start-date"> Start date: </p>
+          <input class="start-bar" type="text"
+          placeholder="MM/DD/Year">
+
+        <p class="end-date"> End Date: </p>
+          <input class="end-bar" type="text"
+          placeholder="MM/DD/Year">
+        
       </div>
 
-      <div class="manage-promotions">
-        <button class="manage-promotions-button"onclick="location.href='../admin-promotions-edit/promotions-admin.html'">
-          <p>Manage Promotions</p>
+      <button class="confirm-button">
+          <p>CONFIRM</p>
         </button>
-      </div>
+        
     </div>
     
   </body>
