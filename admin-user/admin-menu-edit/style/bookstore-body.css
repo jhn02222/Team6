@@ -1,0 +1,40 @@
+.body {
+  background-color: #B02929;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 300px;
+  align-items: center;
+  justify-items: center;
+}
+
+
+.manage-books-button,.manage-users-button,.manage-promotions-button {
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+  cursor: pointer;
+
+}
+
+.manage-books-button:hover {
+        opacity: .9;
+        box-shadow: 5px 5px 5px rgba(0,0,0, .15);
+      }
+.manage-books-button:active {
+        opacity: 0.7;
+      }
+
+.manage-users-button:hover {
+        opacity: 0.9;
+        box-shadow: 5px 5px 5px rgba(0,0,0, .15);
+      }
+.manage-users-button:active {
+        opacity: 0.7;
+      }
+.manage-promotions-button:hover {
+        opacity: 0.9;
+        box-shadow: 5px 5px 5px rgba(0,0,0, .15);
+      }
+.manage-promotions-button:active {
+        opacity: 0.7;
+      }
