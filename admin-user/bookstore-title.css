@@ -1,0 +1,10 @@
+.page {
+  background-color: white;
+  height: 60px;
+  padding-top: 30px;
+}
+.bookstore-title {
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+}
