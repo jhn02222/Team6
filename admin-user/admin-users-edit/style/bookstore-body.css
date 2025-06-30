@@ -1,0 +1,32 @@
+.body {
+  background-color: #B02929;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  height: 1fr;
+  justify-items: center;
+}
+
+
+.manage-users-button {
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.user-img {
+  width: 80px;
+  border-radius: 50px;
+  justify-content: end;
+
+}
+
+.manage-users-button:hover {
+        opacity: 0.9;
+        box-shadow: 5px 5px 5px rgba(0,0,0, .15);
+      }
+.manage-users-button:active {
+        opacity: 0.7;
+      }
