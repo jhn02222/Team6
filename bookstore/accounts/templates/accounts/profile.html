@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Profile</title>
+</head>
+<body>
+    <h1>👤 {{ user.name }}'s Profile</h1>
+
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Account ID:</strong> {{ user.account_id }}</p>
+    <p><strong>Status:</strong> {{ user.status }}</p>
+
+    <hr>
+
+    <h2>Update Personal & Payment Info</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ profile_form.as_p }}
+
+        <h3>Change Password</h3>
+        {{ password_form.as_p }}
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p><a href="{% url 'store_home' %}">← Back to Home</a></p>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Online Bookstore - Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        .navbar {
+            background-color: #333; color: white;
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar a, .navbar button {
+            color: white; margin-left: 15px; text-decoration: none; background: none; border: none; cursor: pointer;
+        }
+        .navbar form { display: inline; }
+        .navbar input[type="text"] {
+            padding: 5px; border-radius: 4px; border: none;
+        }
+        .section { padding: 20px; }
+        .book-grid {
+            display: flex; flex-wrap: wrap; gap: 20px;
+        }
+        .book-card {
+            background: white; border: 1px solid #ccc; padding: 10px; text-align: center; width: 200px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .book-card img { width: 100%; height: 250px; object-fit: cover; }
+        .book-card h4 { margin: 10px 0 5px; }
+        .book-card p { margin: 0 0 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+   <div class="navbar">
+    <div><strong>📚 Online Bookstore</strong></div>
+    <div>
+        <form method="get" action="{% url 'search_books' %}">
+            <input type="text" name="q" placeholder="Search by title, author, or category">
+            <button type="submit">Search</button>
+        </form>
+
+       {% if user.is_authenticated %}
+            {% if not user.is_staff %}
+            <a href="{% url 'profile' %}">👤 Profile</a>
+            <a href="{% url 'order_history' %}">📦 Order History</a>
+            <a href="{% url 'cart_view' %}">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+            {% endif %}
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'signup' %}">Sign Up</a>
+            <a href="{% url 'cart_view' %}">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+        {% endif %}
+    </div>
+</div>
+
+
+    <div class="section">
+        <h2>⭐ Featured Books</h2>
+        <div class="book-grid">
+            {% for book in featured_books %}
+                <div class="book-card">
+                    <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+                    <h4>{{ book.title }}</h4>
+                    <p>by {{ book.author }}</p>
+                    <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a>
+                    <button type="button" class="add-to-cart-btn" data-book-id="{{ book.id }}">Add to Cart</button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>⏳ Coming Soon</h2>
+        <div class="book-grid">
+            {% for book in coming_soon_books %}
+                <div class="book-card">
+                    <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+                    <h4>{{ book.title }}</h4>
+                    <p>by {{ book.author }}</p>
+                    <a href="{% url 'book_detail' book.id %}">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const bookId = this.dataset.bookId;
+            fetch(`/store/cart/ajax-add/${bookId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('cart-count').textContent = data.cart_count;
+                }
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>

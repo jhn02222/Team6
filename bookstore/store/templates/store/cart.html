@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; background-color: white; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        th { background-color: #333; color: white; }
+        button, a.button {
+            background-color: #333; color: white; border: none;
+            padding: 10px 15px; cursor: pointer; border-radius: 4px;
+            text-decoration: none; display: inline-block;
+        }
+        .actions { margin-top: 20px; display: flex; gap: 10px; }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Shopping Cart</h1>
+
+    {% if cart_items %}
+        <table>
+            <tr>
+                <th>Book</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Remove</th>
+            </tr>
+            {% for item in cart_items %}
+                <tr id="row-{{ item.id }}">
+                <td>{{ item.book.title }}</td>
+                <td>${{ item.book.selling_price|floatformat:2 }}</td>
+                <td>
+                    <input type="number" class="qty-input" name="quantity_{{ item.id }}"
+                        min="0" value="{{ item.quantity }}"
+                        data-item-id="{{ item.id }}" data-price="{{ item.book.selling_price }}">
+                </td>
+                <td class="total-price" id="total-{{ item.id }}">
+                    ${{ item.book.selling_price|floatformat:2|add:"0"|add:item.quantity|floatformat:2 }}
+                </td>
+                <td>
+                    <button type="button" class="remove-btn" data-item-id="{{ item.id }}">Remove</button>
+                </td>
+            </tr>
+            {% endfor %}    
+        </table>
+
+        <p><strong>Total:</strong> $<span id="grand-total">{{ total|floatformat:2 }}</span></p>
+        <p><strong>Total:</strong> $<span id="tax-amount">{{ tax|floatformat:2 }}</span></p>
+       
+        <div class="actions">
+            <a href="{% url 'checkout_view' %}" class="button">Proceed to Checkout</a>
+            <a href="{% url 'store_home' %}" class="button">Back to Homepage</a>
+        </div>
+    {% else %}
+        <p>Your cart is empty.</p>
+        <a href="{% url 'store_home' %}" class="button">Back to Homepage</a>
+    {% endif %}
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Helper to recalculate grand total and tax
+    function recalculateGrandTotal() {
+        let grandTotal = 0;
+        document.querySelectorAll('.total-price').forEach(td => {
+            const price = parseFloat(td.textContent.replace('$', '')) || 0;
+            grandTotal += price;
+        });
+        document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
+
+        // Calculate and update tax (7%)
+        const tax = grandTotal * 0.07;
+        document.getElementById('tax-amount').textContent = tax.toFixed(2);
+    }
+
+    // Quantity change
+    document.querySelectorAll('.qty-input').forEach(input => {
+        input.addEventListener('input', () => {
+            const itemId = input.dataset.itemId;
+            const quantity = parseInt(input.value) || 0;
+            const price = parseFloat(input.dataset.price);
+
+            // Optimistically update item total
+            const itemTotal = quantity * price;
+            document.getElementById(`total-${itemId}`).textContent = `$${itemTotal.toFixed(2)}`;
+            recalculateGrandTotal();
+
+            fetch("{% url 'cart_view' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: new URLSearchParams({
+                    item_id: itemId,
+                    quantity: quantity
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.deleted) {
+                        document.getElementById(`row-${itemId}`).remove();
+                        recalculateGrandTotal();
+                    } else {
+                        document.getElementById(`total-${itemId}`).textContent = `$${data.item_total.toFixed(2)}`;
+                        document.getElementById('grand-total').textContent = data.cart_total.toFixed(2);
+                        document.getElementById('tax-amount').textContent = (data.cart_total * 0.07).toFixed(2);
+                    }
+                }
+            });
+        });
+    });
+
+    // Remove button
+    document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const itemId = button.dataset.itemId;
+            // Get the item's total price before removing the row
+            const row = document.getElementById(`row-${itemId}`);
+            const totalCell = row.querySelector('.total-price');
+            const itemTotal = parseFloat(totalCell.textContent.replace('$', '')) || 0;
+
+            // Subtract this item's total from the grand total
+            const grandTotalElem = document.getElementById('grand-total');
+            let grandTotal = parseFloat(grandTotalElem.textContent) || 0;
+            grandTotal -= itemTotal;
+            grandTotalElem.textContent = grandTotal.toFixed(2);
+
+            // Update tax
+            document.getElementById('tax-amount').textContent = (grandTotal * 0.07).toFixed(2);
+
+            // Now remove the row
+            row.remove();
+
+            fetch("{% url 'cart_view' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: new URLSearchParams({
+                    item_id: itemId,
+                    quantity: 0  // triggers deletion
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.deleted) {
+                    grandTotalElem.textContent = data.cart_total.toFixed(2);
+                    document.getElementById('tax-amount').textContent = (data.cart_total * 0.07).toFixed(2);
+                }
+            });
+        });
+    });
+});
+</script>
+
+</body>
+</html>
