@@ -1,0 +1,35 @@
+.body {
+  background-color: #B02929;
+  grid-template-columns: 1fr 1fr ;
+  display: grid;
+  height: 300px;
+  align-items: center;
+  justify-items: center;
+}
+
+.book-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.book-img {
+  width: 250px;
+  border-color: black;
+  border-width: 1px;
+  border-radius: 20px;
+}
+
+.profile-info {
+  grid-template-columns: 1fr 1fr ;
+  display: grid;
+}
+
+.name-bar,.phone-bar,.email-bar,.password-bar {
+  border-radius: 20px;
+  height: 20px;
+}
+
+.name-info,.phone-info,.email-info,.password-info {
+  font-weight: bold;
+  margin-top: 10px;
+}

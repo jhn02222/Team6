@@ -1,0 +1,83 @@
+.header {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-color: black;
+  background-color: #B02929;
+}
+
+.left-section {
+  flex: 1;
+  display: flex;
+  max-width: 200px;
+  justify-content: center;
+}
+
+.bookstore {
+  font-size: 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.middle-section {
+  flex: 1;
+  display: flex;
+}
+
+.search-bar {
+  height: 36px;
+  width: 300px;
+  padding-left: 10px;
+  font-size: 16px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 20px;
+  box-shadow: inset 1px 2px 3px rgba(0,0,0,0.05);
+}
+
+.right-section {
+  flex: 1;
+  justify-content: space-between;
+  display: flex;
+  max-width: 200px;
+
+  justify-content: center;
+}
+
+.home-button,.account-button,.cart-button {
+  border-color: black;
+  border-radius: 3px;
+  height: 30px;
+  margin: 5px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+
+.home-button:hover {
+        opacity: .9;
+        box-shadow: 5px 5px 5px rgba(0,0,0, .15);
+      }
+.home-button:active {
+        opacity: 0.7;
+      }
+
+.account-button:hover {
+        opacity: 0.9;
+        box-shadow: 5px 5px 5px rgba(0,0,0, .15);
+      }
+.account-button:active {
+        opacity: 0.7;
+      }
+.menu-button:hover {
+        opacity: 0.9;
+        box-shadow: 5px 5px 5px rgba(0,0,0, .15);
+      }
+.menu-button:active {
+        opacity: 0.7;
+      }
+
+
+
