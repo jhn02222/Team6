@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ book.title }}</title>
+</head>
+<body>
+    <h1>{{ book.title }}</h1>
+    <p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>Category:</strong> {{ book.category }}</p>
+    <p><strong>Edition:</strong> {{ book.edition }}</p>
+    <p><strong>Publisher:</strong> {{ book.publisher }} ({{ book.publication_year }})</p>
+    <img src="{{ book.cover_image }}" alt="Cover Image" width="200">
+    <p><strong>Price:</strong> ${{ book.selling_price }}</p>
+    <p><strong>In Stock:</strong> {{ book.quantity_in_stock }}</p>
+    <a href="{% url 'store_home' %}">← Back to Store</a>
+</body>
+</html>

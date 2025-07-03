@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Orders</title>
+</head>
+<body>
+    <h1>Your Order History</h1>
+{% if orders %}
+    <ul>
+       {% for order in orders %}
+    <li>
+        <strong>Order #{{ order.id }}</strong> ({{ order.created_at|date:"Y-m-d H:i" }})<br>
+        <ul>
+            {% for item in order.items.all %}
+                <li>
+                    {{ item.book.title }} x{{ item.quantity }} — ${{ item.price_each|floatformat:2 }}
+                    <button type="button" class="reorder-btn" data-book-id="{{ item.book.id }}">Reorder</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'order_confirmation' order.id %}">View Details</a>
+    </li>
+{% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.reorder-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const bookId = this.dataset.bookId;
+            fetch(`/store/cart/ajax-add/${bookId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Optionally update cart counter if you have one
+                    if (document.getElementById('cart-count')) {
+                        document.getElementById('cart-count').textContent = data.cart_count;
+                    }
+                    this.textContent = "Added!";
+                    this.disabled = true;
+                }
+            });
+        });
+    });
+});
+</script>
+    </ul>
+{% else %}
+    <p>You have no orders yet.</p>
+{% endif %}
+    <a href="{% url 'store_home' %}">← Back to Home</a>
+    <a href="{% url 'cart_view' %}">View Cart</a>
+</body>
+</html>

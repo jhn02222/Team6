@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+</head>
+<body>
+   <h1>Checkout</h1>
+<form method="post">
+    {% csrf_token %}
+    <h3>Shipping Address</h3>
+    <input type="text" name="address" value="{{ saved_address }}" required>
+    <button type="button" onclick="document.querySelector('[name=address]').value=''">Change</button>
+
+    <h3>Payment Card</h3>
+    {% if saved_card %}
+        <p>Saved Card: **** **** **** {{ saved_card }}</p>
+    {% endif %}
+    <input type="text" name="card_last4" maxlength="4" placeholder="Last 4 digits" value="{{ saved_card|default:'' }}" required>
+    <button type="button" onclick="document.querySelector('[name=card_last4]').value=''">Change</button>
+
+    <h3>Order Summary</h3>
+    <ul>
+        {% for item in cart_items %}
+            <li>{{ item.book.title }} x{{ item.quantity }} — ${{ item.book.selling_price|floatformat:2 }}</li>
+        {% endfor %}
+    </ul>
+    <button type="submit">Place Order</button>
+</form>
+    <a href="{% url 'store_home' %}">← Back to Home</a>
+</body>
+</html>
