@@ -12,6 +12,20 @@
             justify-content: space-between; 
             align-items: center;
         }
+    .image-box {
+      background-color: black;
+    }
+    
+    .body {
+      background-color: #B02929;
+      grid-template-columns: 1fr 1fr;
+      display: grid;
+    }
+
+    .book-info {
+      grid-template-columns: 1fr 1fr;
+      display: grid;
+    }
 
   </style>
 </head>
@@ -25,15 +39,38 @@
             <a href="{% url 'logout' %}">Logout</a>
         </div>
   </div>
-
-  <div class="section">
+  <div><div class="section"></div>
+  
     <h1>Add Book</h1>
     <form method="POST">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit">Save Book</button>
-    </form>
-    <a href="{% url 'admin' %}">Back to Dashboard</a>
+    <div class="body">
+        <div class="image-box"><p><img class="book-img"> image</p></div>
+        
+        <div class="book-info">
+          <p class="title-info"> title: </p>
+            <input class="title-bar" type="text"
+            placeholder="title">
+          
+
+          <p class="author-info"> author: </p>
+            <input class="author-bar" type="text"
+            placeholder="author">
+
+          <p class="isbn-info"> ISBN: </p>
+            <input class="isbn-bar" type="text"
+            placeholder="isbn">
+          
+
+          <p class="price-info"> price: </p>
+            <input class="price-bar" type="text"
+            placeholder="price">
+        </div>
+        <button type="submit">Save Book</button>
+      </form>
+      <a href="{% url 'admin' %}">Back to Dashboard</a>
+    </div>
   </div>
 
 </body>
