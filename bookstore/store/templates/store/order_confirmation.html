@@ -7,7 +7,7 @@
     <h1>🎉 Thank You for Your Order!</h1>
 
     <h3>Order Summary</h3>
-    <p>Order ID: {{ order.id }}</p>
+    <p>Order ID: {{ order.order_id }}</p>
     <p>Date: {{ order.created_at }}</p>
     <p>Shipping Address: {{ order.shipping_address }}</p>
     <p>Card: **** **** **** {{ order.payment_card_last4 }}</p>
@@ -18,13 +18,13 @@
             <th>Quantity</th>
             <th>Price</th>
         </tr>
-        {% for item in order.items.all %}
-            <tr>
-                <td>{{ item.book.title }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>${{ item.price_each }}</td>
-            </tr>
-        {% endfor %}
+        {% for item in order_items %}
+    <tr>
+        <td>{{ item.book.title }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>${{ item.price_each }}</td>
+    </tr>
+{% endfor %}
     </table>
 
     <p>Subtotal: ${{ order.total_before_tax }}</p>

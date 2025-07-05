@@ -9,7 +9,7 @@
     <ul>
        {% for order in orders %}
     <li>
-        <strong>Order #{{ order.id }}</strong> ({{ order.created_at|date:"Y-m-d H:i" }})<br>
+        <strong>Order #{{ order.order_id }}</strong> ({{ order.created_at|date:"Y-m-d H:i" }})<br>
         <ul>
             {% for item in order.items.all %}
                 <li>
@@ -18,7 +18,7 @@
                 </li>
             {% endfor %}
         </ul>
-        <a href="{% url 'order_confirmation' order.id %}">View Details</a>
+        <a href="{% url 'order_confirmation' order.order_id %}">View Details</a>
     </li>
 {% endfor %}
 

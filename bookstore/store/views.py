@@ -152,7 +152,7 @@ def checkout_view(request):
             )
         cart_items.delete()
         # TODO: send confirmation email here
-        return redirect('order_confirmation', order_id=order.id)
+        return redirect('order_confirmation', order_id=order.order_id)
 
     return render(request, 'store/checkout.html', {
         'cart_items': cart_items,
@@ -161,7 +161,7 @@ def checkout_view(request):
     })
 @login_required
 def order_confirmation(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(Order, order_id=order_id, user=request.user)  
     order_items = order.items.select_related('book')
     return render(request, 'store/order_confirmation.html', {
         'order': order,

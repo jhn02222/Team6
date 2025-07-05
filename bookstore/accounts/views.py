@@ -1,20 +1,17 @@
-from django.shortcuts import render, redirect
-from .forms import SignUpForm, LoginForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import SignUpForm, LoginForm, EditProfileForm, CustomPasswordChangeForm
 from .models import Users
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.conf import settings
 from django.http import HttpResponse
-import uuid
 from bookstore.utils import custom_login_required, staff_required
-from django.contrib.auth import logout
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
-from .forms import EditProfileForm, CustomPasswordChangeForm
+import uuid
 
-verification_tokens = {}  # Ideally, store in a real model
+# Use database-backed model or cache in production
+verification_tokens = {}
 
 def signup_view(request):
     if request.method == 'POST':
@@ -44,7 +41,7 @@ def signup_view(request):
 def verify_email(request, token):
     email = verification_tokens.get(token)
     if email:
-        user = Users.objects.get(email=email)
+        user = get_object_or_404(Users, email=email)
         user.status = "Active"
         if not user.account_id:
             user.account_id = uuid.uuid4()
@@ -62,11 +59,11 @@ def login_view(request):
             password = form.cleaned_data['password']
             user = None
 
-            # Try to find user by email
+            # Try email first
             try:
                 user = Users.objects.get(email=identifier)
             except Users.DoesNotExist:
-                # Try to parse as UUID and fetch by account_id
+                # Try UUID-based login
                 try:
                     uuid_obj = uuid.UUID(identifier)
                     user = Users.objects.get(account_id=uuid_obj)
@@ -94,11 +91,10 @@ def login_view(request):
             else:
                 login(request, user)
                 return redirect('admin' if user.is_staff or user.is_superuser else 'store_home')
-
     else:
         form = LoginForm()
-
     return render(request, 'accounts/login.html', {'form': form})
+
 
 def login_success(request):
     return HttpResponse("Yay! You're in. This is the login success page.")
@@ -108,8 +104,10 @@ def login_success(request):
 def admin_home(request):
     return render(request, 'admin/home.html')
 
+
 def unauthorized(request):
     return render(request, 'accounts/unauthorized.html')
+
 
 @custom_login_required
 def profile_view(request):
@@ -120,8 +118,8 @@ def profile_view(request):
 
         if profile_form.is_valid() and password_form.is_valid():
             profile_form.save()
-            user = password_form.save()
-            update_session_auth_hash(request, user)
+            updated_user = password_form.save()
+            update_session_auth_hash(request, updated_user)
             messages.success(request, 'Profile and password updated successfully!')
             return redirect('profile')
     else:
@@ -137,5 +135,4 @@ def profile_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('store_home') 
-
+    return redirect('store_home')

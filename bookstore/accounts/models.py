@@ -23,7 +23,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
         ('Suspended', 'Suspended') 
     ]
 
-    account_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    account_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
