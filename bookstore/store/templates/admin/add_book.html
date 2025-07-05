@@ -9,18 +9,24 @@
       font-weight: bold;
       margin: 0;
       padding: 0;
-      background-color: #f5f5f5;
+      background-color: #B02929;
       
     }
 
     .navbar {
-            background-color: #B02929;
-            color: white;
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
+      background-color: black;
+      color: white;
+      padding: 10px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
         }
+
+    .header {
+      background-color: white;
+      margin: 0;
+      padding: 20px;
+    }
     .image-box {
       background-color: black;
     }
@@ -34,33 +40,77 @@
       background-color: #B02929;
       display: grid;
       height: 500px;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 2fr;
       display: grid;
-      justify-content: space-between;
+      gap: 20px;
+      padding: 10px;
+      margin-top: 50px;
+    }
+    .left-side {
+      background-color: white;
+      border: 1px solid black;
+      border-radius: 10px;
+      padding: 5px;
     }
     .right-side {
+      background-color: white;
       display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 10px 30px;
-      align-items: center;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid black;
+      border-radius: 10px;
+      margin: 0;
+      padding: 5px;
       
     }
-    .submit {
+
+    .add-button {
       max-width: 100px;
+      height: 45px;
+      background-color: #B02929;
+      color: white;border-radius: 3px;
+      margin: 5px;
+    }
+    .add-button:hover {
+      cursor: pointer;
     }
 
     .section {
-      margin-bottom: 50px;
+      margin: 0;
+      padding: 0;
     }
 
     input, select, textarea {
-  padding: 10px;
-  font-size: 1px;
-  width: 200px;
-  border: 1px solid #060101;
-  border-radius: 6px;
-  box-sizing: border-box;
-  margin-bottom: 15px;
+    padding: 10px;
+    font-size: 10px;
+    width: 300px;
+    border: 2px solid #060101;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.info {
+  display: contents;
+  margin: 0;
+  padding: 0;
+}
+.right-left-side {
+  display: grid;
+  align-items: start;
+  margin: 5px;
+}
+
+.right-right-side {
+  display: grid;
+  align-items: start;
+  margin: 5px;
+}
+
+.back-dashboard {
+  background-color: white;
+  padding: 5px;
+  margin: 10px;
+  border-radius: 10px;
+  border: 1px solid black;
 }
 
   </style>
@@ -78,7 +128,7 @@
   <div>
     
     <div class="section">
-      <h1>Add Book</h1> 
+      <h1 class="header">Add Book</h1> 
     </div>
     <form method="POST">
       {% csrf_token %}
@@ -89,78 +139,81 @@
          {{form.cover_image}}
       </div>
       <div class="right-side"> 
-
-        <div class="label-info">
+        <div class="right-left-side">
+        <div class="info">
         {{form.isbn.label_tag}}
          {{form.isbn}}
         </div>
       
-        <div class="title-info">
+        <div class="info">
           {{form.title.label_tag}}
           {{form.title}}
         </div>
       
-        <div class="author-info">
+        <div class="info">
           {{form.author.label_tag}}
           {{form.author}}
         </div>
 
-        <div class="category-info">
+        <div class="info">
         {{form.category.label_tag}}
          {{form.category}}
         </div>
       
-        <div class="edition-info">
+        <div class="info">
           {{form.edition.label_tag}}
           {{form.edition}}
         </div>
       
-        <div class="publisher-info">
+        <div class="info">
           {{form.publisher.label_tag}}
           {{form.publisher}}
         </div>
 
-        <div class="publication-info">
+        <div class="info">
         {{form.publication_year.label_tag}}
          {{form.publication_year}}
         </div>
+      </div>
       
-        <div class="quantity-info">
+      <div class="right-right-side">
+        <div class="info">
           {{form.quantity_in_stock.label_tag}}
           {{form.quantity_in_stock}}
         </div>
       
-        <div class="minimum-threshold-info">
+        <div class="info">
           {{form.minimum_threshold.label_tag}}
           {{form.minimum_threshold}}
         </div>
 
-        <div class="buying-price-info">
+        <div class="info">
         {{form.buying_price.label_tag}}
          {{form.buying_price}}
         </div>
       
-        <div class="selling-price-info">
+        <div class="info">
           {{form.selling_price.label_tag}}
           {{form.selling_price}}
         </div>
       
-        <div class="featured-info">
+        <div class="info">
           {{form.is_featured.label_tag}}
           {{form.is_featured}}
         </div>
         
-        <div class="release-info">
+        <div class="info">
           {{form.release_date.label_tag}}
           {{form.release_date}}
         </div>
-    
-        <button type="submit">Save Book</button>
+        <button type="submit" class="add-button">Save Book</button>
+    </div>
+        
 
       </div>
     </form>
   </div>
-  <a href="{% url 'admin' %}">Back to Dashboard</a>
+  <a href="{% url 'admin' %}" class="back-dashboard">Back to Dashboard</a>
 </body>
 
 </html>

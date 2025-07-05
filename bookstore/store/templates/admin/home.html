@@ -3,9 +3,14 @@
 <head>
     <title>Admin Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; padding: 0; 
+            background-color: #B02929; 
+            
+        }
         .navbar {
-            background-color: #B02929;
+            background-color: black;
             color: white;
             padding: 10px 20px; 
             display: flex; 
@@ -18,25 +23,26 @@
             text-decoration: none;
         }
         .section { 
-            padding: 20px; 
+            padding:0; 
         }
 
-        .body {
+        .body-buttons {
             background-color: #B02929;
             grid-template-columns: 1fr 1fr 1fr;
             display: grid;
             align-items: center;
             justify-items: center;
-            height: 300px;
+            height: 600px;
         }
 
         .add-books-button, .manage-users-button, .manage-promotions-button{
             background-color: white;
-            width: 150px;
-            height: 100px;
+            width: 200px;
+            height: 200px;
             padding: 20px;
             text-decoration: none;
             border-radius: 10px;
+            border: 2px solid black;
             font-weight: bold;
             display: flex;
             flex-direction: column;
@@ -45,6 +51,11 @@
             color: black;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            background-color: white;
+            margin: 0;
+            padding: 10px;
         }
 
 
@@ -62,9 +73,9 @@
     </div>
 
     <div class="section">
-        <h1>Welcome, Admin!</h1>
-        <p style="margin-bottom: 100px;">This is the admin dashboard. You can manage books, users, and promotions here.</p>
-        <div class="body">
+        <h1 class="header">Welcome, Admin!</h1>
+        <p class="header">This is the admin dashboard. You can manage books, users, and promotions here.</p>
+        <div class="body-buttons">
                 <div class="add-books"> 
                     <a href="{% url 'add_book' %}" class="add-books-button">➕ Add Book</a>
                 </div>
