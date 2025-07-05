@@ -2,16 +2,92 @@
 <html>
 <head>
     <title>{{ book.title }}</title>
+    <style>
+
+        body {
+            background-color: #B02929;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bookstore {
+            background-color: black;
+            color: white;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .book-title {
+            background-color: white;
+            padding: 10px;
+            margin: 0;
+            margin-bottom: 80px;
+        }
+
+        .content {
+            grid-template-columns: 1fr 1fr;
+            display: grid;
+            height: 500px;
+            border-radius: 10px;
+            background-color: white;
+            border: 2px solid black;
+            margin: 10px;
+            align-items: center;
+        }
+
+        .left-side {
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            
+        }
+
+        .book-img {
+            border-radius: 10px;
+            border: 2px solid black;
+            width: 300px;
+            padding: 0;
+            margin-left: 10px;
+        }
+        .info {
+            font-size: 30px;
+        }
+
+        .back-store {
+            background-color: #ffffff; 
+            color: rgb(0, 0, 0); 
+            border-color: black;
+            padding: 10px; 
+            cursor: pointer; 
+            border-radius: 4px;
+            border: 2px solid black;
+            text-decoration: none; 
+            display: inline-block;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>{{ book.title }}</h1>
-    <p><strong>Author:</strong> {{ book.author }}</p>
-    <p><strong>Category:</strong> {{ book.category }}</p>
-    <p><strong>Edition:</strong> {{ book.edition }}</p>
-    <p><strong>Publisher:</strong> {{ book.publisher }} ({{ book.publication_year }})</p>
-    <img src="{{ book.cover_image }}" alt="Cover Image" width="200">
-    <p><strong>Price:</strong> ${{ book.selling_price }}</p>
-    <p><strong>In Stock:</strong> {{ book.quantity_in_stock }}</p>
-    <a href="{% url 'store_home' %}">← Back to Store</a>
+    <h1 class="bookstore">Bookstore</h1>
+    <h2 class =book-title>{{ book.title }}</h2>
+    <div class="content">
+
+        <div class="left-side">
+            <img src="{{ book.cover_image }}" alt="Cover Image" width="200" class="book-img">
+        </div>
+
+         <div class="rightside"> 
+            <p class="info"><strong>Author:</strong> {{ book.author }}</p>
+            <p class="info"><strong>Category:</strong> {{ book.category }}</p>
+            <p class="info"><strong>Edition:</strong> {{ book.edition }}</p>
+            <p class="info"><strong>Publisher:</strong> {{ book.publisher }} ({{ book.publication_year }})</p>
+            <p class="info"><strong>Price:</strong> ${{ book.selling_price }}</p>
+            <p class="info"><strong>In Stock:</strong> {{ book.quantity_in_stock }}</p>
+        </div>
+    </div>
+   
+    <a href="{% url 'store_home' %}" class="back-store">← Back to Store</a>
 </body>
 </html>

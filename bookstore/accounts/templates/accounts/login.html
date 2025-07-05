@@ -1,20 +1,39 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-<head><title>Login</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="{% static 'store/styles.css' %}" />
+</head>
 <body>
-  <h2>Login</h2>
-  {% if messages %}
-    <ul style="color: red;">
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+  <header class="navbar">
+    <div class="logo">Bookstore</div>
+    <div class="nav-buttons">
+      <a href="{% url 'store_home' %}" class="btn btn-nav">Home</a>
+      <a href="{% url 'login' %}" class="btn btn-nav">Login</a>
+      <a href="{% url 'cart_view' %}" class="btn btn-nav">Cart</a>
+    </div>
+  </header>
 
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-  </form>
+  <main class="auth-page">
+    <div class="auth-box">
+      <h2>Login</h2>
+      {% if messages %}
+        <ul style="color: red;">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Confirm</button>
+        <p class="link-text">No Account? <a href="{% url 'signup' %}">Register</a></p>
+      </form>
+    </div>
+  </main>
 </body>
 </html>

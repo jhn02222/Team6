@@ -2,30 +2,115 @@
 <html>
 <head>
     <title>Checkout</title>
+    <style>
+
+        body {
+            background-color: #B02929;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bookstore {
+            background-color: black;
+            color: white;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .header {
+            background-color: white;
+            margin: 0;
+            padding: 10px;
+            margin-bottom: 80px;
+        }
+        .body-checkout {
+            background-color: white;
+            grid-template-columns: 1fr 1fr;
+            display: grid;
+            margin: 20px;
+            border: 2px solid black;
+            border-radius: 10px;
+        }
+
+        .left-side {
+            margin: 10px;
+        }
+        .right-side {
+            margin: 10px;
+        }
+
+        button {
+            background-color: #B02929;
+            color:white;
+            font-weight: bold;
+            height: 30px;
+            border-radius: 3px;
+        }
+
+        .text-box {
+            height: 26px;
+            border-radius: 3px;
+        }
+        .submit-button {
+            background-color: #B02929;
+            color:white;
+            font-weight: bold;
+            height: 30px;
+            border-radius: 3px;
+        }
+
+        .submit-button:hover {
+            cursor: pointer;
+        }
+
+        .back-home {
+            background-color: #ffffff; 
+            color: rgb(0, 0, 0); 
+            border-color: black;
+            padding: 10px; 
+            cursor: pointer; 
+            border-radius: 4px;
+            border: 2px solid black;
+            text-decoration: none; 
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+    </style>
 </head>
 <body>
-   <h1>Checkout</h1>
+    <h1 class="bookstore">Bookstore</h1>
+   <h2 class="header">Checkout</h2>
+   
+
 <form method="post">
     {% csrf_token %}
-    <h3>Shipping Address</h3>
-    <input type="text" name="address" value="{{ saved_address }}" required>
-    <button type="button" onclick="document.querySelector('[name=address]').value=''">Change</button>
+    <div class="body-checkout">
+        <div class="left-side">
+            <h3>Shipping Address</h3>
+            <input type="text" name="address" value="{{ saved_address }}" required class="text-box">
+            <button type="button" onclick="document.querySelector('[name=address]').value=''">Change</button>
 
-    <h3>Payment Card</h3>
-    {% if saved_card %}
-        <p>Saved Card: **** **** **** {{ saved_card }}</p>
-    {% endif %}
-    <input type="text" name="card_last4" maxlength="4" placeholder="Last 4 digits" value="{{ saved_card|default:'' }}" required>
-    <button type="button" onclick="document.querySelector('[name=card_last4]').value=''">Change</button>
+            <h3>Payment Card</h3>
+            {% if saved_card %}
+                <p>Saved Card: **** **** **** {{ saved_card }}</p>
+            {% endif %}
+            <input type="text" name="card_last4" maxlength="4" placeholder="Last 4 digits" value="{{ saved_card|default:'' }}" required class="text-box">
+            <button type="button" onclick="document.querySelector('[name=card_last4]').value=''">Change</button>
+        </div>
 
-    <h3>Order Summary</h3>
-    <ul>
-        {% for item in cart_items %}
-            <li>{{ item.book.title }} x{{ item.quantity }} — ${{ item.book.selling_price|floatformat:2 }}</li>
-        {% endfor %}
-    </ul>
-    <button type="submit">Place Order</button>
+        <div class="right-side">
+            <h3>Order Summary</h3>
+            <ul>
+                {% for item in cart_items %}
+                    <li>{{ item.book.title }} x{{ item.quantity }} — ${{ item.book.selling_price|floatformat:2 }}</li>
+                {% endfor %}
+            </ul>
+            <button type="submit" class="submit-button">Place Order</button>
+        </div>
 </form>
-    <a href="{% url 'store_home' %}">← Back to Home</a>
+    
+</div>
+    <a href="{% url 'store_home' %}" class="back-home">← Back to Home</a>
 </body>
 </html>

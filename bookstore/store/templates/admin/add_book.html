@@ -1,13 +1,220 @@
 <!DOCTYPE html>
 <html>
-<head><title>Add a New Book</title></head>
+<head>
+  <title>Add a New Book</title>
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
+      background-color: #B02929;
+      
+    }
+
+    .navbar {
+      background-color: black;
+      color: white;
+      padding: 10px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+        }
+
+    .header {
+      background-color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    .image-box {
+      background-color: black;
+    }
+
+    .book-info {
+      grid-template-columns: 1fr 1fr;
+      display: grid;
+    }
+
+    .body-info {
+      background-color: #B02929;
+      display: grid;
+      height: 500px;
+      grid-template-columns: 1fr 2fr;
+      display: grid;
+      gap: 20px;
+      padding: 10px;
+      margin-top: 50px;
+    }
+    .left-side {
+      background-color: white;
+      border: 1px solid black;
+      border-radius: 10px;
+      padding: 5px;
+    }
+    .right-side {
+      background-color: white;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid black;
+      border-radius: 10px;
+      margin: 0;
+      padding: 5px;
+      
+    }
+
+    .add-button {
+      max-width: 100px;
+      height: 45px;
+      background-color: #B02929;
+      color: white;border-radius: 3px;
+      margin: 5px;
+    }
+    .add-button:hover {
+      cursor: pointer;
+    }
+
+    .section {
+      margin: 0;
+      padding: 0;
+    }
+
+    input, select, textarea {
+    padding: 10px;
+    font-size: 10px;
+    width: 300px;
+    border: 2px solid #060101;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.info {
+  display: contents;
+  margin: 0;
+  padding: 0;
+}
+.right-left-side {
+  display: grid;
+  align-items: start;
+  margin: 5px;
+}
+
+.right-right-side {
+  display: grid;
+  align-items: start;
+  margin: 5px;
+}
+
+.back-dashboard {
+  background-color: white;
+  color: black;
+  padding: 5px;
+  margin: 10px;
+  border-radius: 3px;
+  border: 2px solid black;
+}
+
+  </style>
+</head>
 <body>
-  <h1>Add Book</h1>
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Book</button>
-  </form>
-  <a href="{% url 'admin' %}">Back to Dashboard</a>
+
+  <div class="navbar">
+        <div>
+            <strong>⚙️ Admin Panel</strong>
+        </div>
+        <div>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+  </div>
+  <div>
+    
+    <div class="section">
+      <h1 class="header">Add Book</h1> 
+    </div>
+    <form method="POST">
+      {% csrf_token %}
+    <div class="body-info">
+      
+      <div class="left-side">
+        {{form.cover_image.label_tag}}
+         {{form.cover_image}}
+      </div>
+      <div class="right-side"> 
+        <div class="right-left-side">
+        <div class="info">
+        {{form.isbn.label_tag}}
+         {{form.isbn}}
+        </div>
+      
+        <div class="info">
+          {{form.title.label_tag}}
+          {{form.title}}
+        </div>
+      
+        <div class="info">
+          {{form.author.label_tag}}
+          {{form.author}}
+        </div>
+
+        <div class="info">
+        {{form.category.label_tag}}
+         {{form.category}}
+        </div>
+      
+        <div class="info">
+          {{form.edition.label_tag}}
+          {{form.edition}}
+        </div>
+      
+        <div class="info">
+          {{form.publisher.label_tag}}
+          {{form.publisher}}
+        </div>
+
+        <div class="info">
+        {{form.publication_year.label_tag}}
+         {{form.publication_year}}
+        </div>
+      </div>
+      
+      <div class="right-right-side">
+        <div class="info">
+          {{form.quantity_in_stock.label_tag}}
+          {{form.quantity_in_stock}}
+        </div>
+      
+        <div class="info">
+          {{form.minimum_threshold.label_tag}}
+          {{form.minimum_threshold}}
+        </div>
+
+        <div class="info">
+        {{form.buying_price.label_tag}}
+         {{form.buying_price}}
+        </div>
+      
+        <div class="info">
+          {{form.selling_price.label_tag}}
+          {{form.selling_price}}
+        </div>
+      
+        <div class="info">
+          {{form.is_featured.label_tag}}
+          {{form.is_featured}}
+        </div>
+        
+        <div class="info">
+          {{form.release_date.label_tag}}
+          {{form.release_date}}
+        </div>
+        <button type="submit" class="add-button">Save Book</button>
+    </div>
+        
+
+      </div>
+    </form>
+  </div>
+  <a href="{% url 'admin' %}" class="back-dashboard">Back to Dashboard</a>
 </body>
+
 </html>
