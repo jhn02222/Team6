@@ -1,36 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
     <title>Your Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="{% static 'accounts/style.css' %}" />
 </head>
 <body>
-    <h1>👤 {{ user.name }}'s Profile</h1>
+    <header class="navbar">
+        <div class="logo">Bookstore</div>
+        <div class="nav-buttons">
+            <a href="{% url 'store_home' %}" class="btn btn-nav">Home</a>
+            <a href="{% url 'cart_view' %}" class="btn btn-nav">Cart</a>
+            <a href="{% url 'logout' %}" class="btn btn-nav">Logout</a>
+        </div>
+    </header>
 
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Account ID:</strong> {{ user.account_id }}</p>
-    <p><strong>Status:</strong> {{ user.status }}</p>
+    <main class="auth-page">
+        <div class="auth-box" style="max-width: 400px;">
+            <h2>👤 {{ user.username }}'s Profile</h2>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Account ID:</strong> {{ user.id }}</p>
+            {% if user.status %}
+                <p><strong>Status:</strong> {{ user.status }}</p>
+            {% endif %}
 
-    <hr>
+            <hr style="margin: 20px 0;">
 
-    <h2>Update Personal & Payment Info</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ profile_form.as_p }}
+            <h3>Update Personal & Payment Info</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ profile_form.as_p }}
 
-        <h3>Change Password</h3>
-        {{ password_form.as_p }}
+                <h3>Change Password</h3>
+                {{ password_form.as_p }}
 
-        <button type="submit">Save Changes</button>
-    </form>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
 
-    {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
-    <p><a href="{% url 'store_home' %}">← Back to Home</a></p>
+            <p class="link-text" style="margin-top:20px;">
+                <a href="{% url 'store_home' %}">← Back to Home</a>
+            </p>
+        </div>
+    </main>
 </body>
 </html>

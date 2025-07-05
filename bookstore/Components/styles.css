@@ -12,7 +12,7 @@ body {
 
 /* Navbar */
 .navbar {
-  background-color: #000000;
+  background-color: #b22222;
   padding: 15px;
   display: flex;
   align-items: center;
@@ -97,24 +97,26 @@ body {
 }
 
 .card img {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
+  width: 50px;
   margin-bottom: 10px;
 }
 
 /* Auth Pages */
 .auth-page {
   background-color: #b22222;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 32px 16px;
-  box-sizing: border-box;
-  overflow-y: auto; /* allows scrolling */
-  /* REMOVE align-items: center */
+  align-items: center;
 }
 
+.auth-box {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  width: 300px;
+}
 
 .auth-box h2 {
   margin-bottom: 20px;
@@ -142,65 +144,4 @@ body {
 .link-text.small {
   font-size: 0.8em;
   color: #b22222;
-}
-.search-btn {
-  background-color: white;
-  color: black;
-  border: 2px solid #000000;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 1em;
-  font-weight: bold;
-  cursor: pointer;
-  margin-left: 8px;
-  transition: background-color 0.2s;
-}
-.search-btn:hover {
-  background-color: #f2f2f2;
-}
-.auth-box textarea {
-  width: 100%;
-  min-height: 60px;
-  max-height: 120px;
-  resize: vertical;
-  border-radius: 8px;
-  border: 2px solid #b22222;
-  padding: 10px;
-  font-size: 1em;
-  box-sizing: border-box;
-}
-
-.auth-box {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  text-align: center;
-  width: 100%;
-  max-width: 400px;
-  margin: 40px auto; /* gives top/bottom breathing room */
-  box-sizing: border-box;
-}
-
-.auth-box input[type="text"],
-.auth-box input[type="email"],
-.auth-box input[type="password"],
-.auth-box input[type="number"],
-.auth-box select,
-.auth-box textarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px;
-  margin-bottom: 12px;
-  border: 2px solid #000000;
-  border-radius: 8px;
-  font-size: 1em;
-  resize: vertical;
-  max-width: 100%;
-}
-
-@media (max-width: 450px) {
-  .auth-box {
-    padding: 12px;
-    max-width: 98vw;
-  }
 }
