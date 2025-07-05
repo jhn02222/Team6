@@ -1,5 +1,32 @@
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Sign Up</button>
-</form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="{% static 'accounts/style.css' %}" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">Bookstore</div>
+    <div class="nav-buttons">
+      <a href="{% url 'store_home' %}" class="btn btn-nav">Home</a>
+      <a href="{% url 'login' %}" class="btn btn-nav">Login</a>
+      <a href="{% url 'cart_view' %}" class="btn btn-nav">Cart</a>
+    </div>
+  </header>
+
+  <main class="auth-page">
+    <div class="auth-box">
+      <h2>Sign Up</h2>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+      </form>
+      <p class="link-text">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+  </main>
+</body>
+</html>
