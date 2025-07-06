@@ -3,91 +3,140 @@
 <head>
     <title>{{ book.title }}</title>
     <style>
-
         body {
             background-color: #B02929;
             margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
         }
 
         .bookstore {
             background-color: black;
             color: white;
-            margin: 0;
-            padding: 10px;
+            padding: 15px 20px;
+            font-size: 1.5em;
         }
 
         .book-title {
             background-color: white;
-            padding: 10px;
-            margin: 0;
-            margin-bottom: 80px;
+            padding: 20px;
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
         .content {
-            grid-template-columns: 1fr 1fr;
             display: grid;
-            height: 500px;
-            border-radius: 10px;
+            grid-template-columns: 1fr 1fr;
             background-color: white;
+            border-radius: 10px;
             border: 2px solid black;
-            margin: 10px;
-            align-items: center;
+            margin: 0 auto 30px;
+            width: 80%;
+            max-width: 900px;
+            padding: 30px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
 
         .left-side {
-            justify-content: center;
-            align-items: center;
             display: flex;
-            margin: 0;
-            padding: 0;
-            
+            align-items: center;
+            justify-content: center;
         }
 
         .book-img {
             border-radius: 10px;
             border: 2px solid black;
-            width: 300px;
-            padding: 0;
-            margin-left: 10px;
+            width: 280px;
+            height: auto;
+            object-fit: cover;
         }
+
+        .right-side {
+            padding-left: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
         .info {
-            font-size: 30px;
+            font-size: 1.2em;
+            margin-bottom: 12px;
+        }
+
+        .rating-stars {
+            font-size: 1.5em;
+            color: #f5b50a;
+            margin-right: 10px;
+        }
+
+        .rating-number {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .no-rating {
+            font-size: 1.1em;
+            color: #999;
         }
 
         .back-store {
-            background-color: #ffffff; 
-            color: rgb(0, 0, 0); 
-            border-color: black;
-            padding: 10px; 
-            cursor: pointer; 
-            border-radius: 4px;
+            background-color: #fff;
+            color: black;
             border: 2px solid black;
-            text-decoration: none; 
-            display: inline-block;
-            margin-left: 10px;
+            padding: 10px 18px;
+            cursor: pointer;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 30px;
+            transition: background-color 0.2s;
+        }
+
+        .back-store:hover {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <h1 class="bookstore">Bookstore</h1>
-    <h2 class =book-title>{{ book.title }}</h2>
-    <div class="content">
+    <h1 class="bookstore">📚 Bookstore</h1>
+    <h2 class="book-title">{{ book.title }}</h2>
 
+    <div class="content">
         <div class="left-side">
-            <img src="{{ book.cover_image }}" alt="Cover Image" width="200" class="book-img">
+            <img src="{{ book.cover_image }}" alt="Cover Image" class="book-img">
         </div>
 
-         <div class="rightside"> 
+        <div class="right-side">
             <p class="info"><strong>Author:</strong> {{ book.author }}</p>
             <p class="info"><strong>Category:</strong> {{ book.category }}</p>
             <p class="info"><strong>Edition:</strong> {{ book.edition }}</p>
             <p class="info"><strong>Publisher:</strong> {{ book.publisher }} ({{ book.publication_year }})</p>
             <p class="info"><strong>Price:</strong> ${{ book.selling_price }}</p>
             <p class="info"><strong>In Stock:</strong> {{ book.quantity_in_stock }}</p>
+
+            <p class="info">
+                <strong>Rating:</strong>
+                {% if book.rating %}
+                    {% with book.rating|floatformat:0|add:"0" as stars %}
+                        <span class="rating-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= stars %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                        </span>
+                        <span class="rating-number">({{ book.rating }})</span>
+                    {% endwith %}
+                {% else %}
+                    <span class="no-rating">No rating</span>
+                {% endif %}
+            </p>
         </div>
     </div>
-   
+
     <a href="{% url 'store_home' %}" class="back-store">← Back to Store</a>
 </body>
 </html>

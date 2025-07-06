@@ -2,36 +2,121 @@
 <html>
 <head>
     <title>Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2e7d32;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            color: #333;
+            margin-top: 30px;
+        }
+
+        p {
+            font-size: 1.05em;
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .total-line {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .thanks-note {
+            margin-top: 30px;
+            font-size: 1.05em;
+            color: #444;
+            text-align: center;
+        }
+
+        .return-link {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            background-color: #b22222;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .return-link:hover {
+            background-color: #8a1c1c;
+        }
+    </style>
 </head>
 <body>
-    <h1>🎉 Thank You for Your Order!</h1>
+    <div class="container">
+        <h1>🎉 Thank You for Your Order!</h1>
 
-    <h3>Order Summary</h3>
-    <p>Order ID: {{ order.order_id }}</p>
-    <p>Date: {{ order.created_at }}</p>
-    <p>Shipping Address: {{ order.shipping_address }}</p>
-    <p>Card: **** **** **** {{ order.payment_card_last4 }}</p>
+        <h3>Order Summary</h3>
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Date:</strong> {{ order.created_at|date:"Y-m-d H:i" }}</p>
+        <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+        <p><strong>Card:</strong> **** **** **** {{ order.payment_card_last4 }}</p>
 
-    <table>
-        <tr>
-            <th>Book</th>
-            <th>Quantity</th>
-            <th>Price</th>
-        </tr>
-        {% for item in order_items %}
-    <tr>
-        <td>{{ item.book.title }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>${{ item.price_each }}</td>
-    </tr>
-{% endfor %}
-    </table>
+        <table>
+            <tr>
+                <th>Book</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+            {% for item in order_items %}
+                <tr>
+                    <td>{{ item.book.title }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.price_each|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
 
-    <p>Subtotal: ${{ order.total_before_tax }}</p>
-    <p>Tax: ${{ order.total_after_tax|floatformat:2|add:"-"|add:order.total_before_tax|floatformat:2 }}</p>
-    <p><strong>Total: ${{ order.total_after_tax }}</strong></p>
+        <p class="total-line">Subtotal: ${{ order.total_before_tax|floatformat:2 }}</p>
+        <p class="total-line">Tax: ${{ order.total_after_tax|floatformat:2|add:"-"|add:order.total_before_tax|floatformat:2 }}</p>
+        <p class="total-line"><strong>Total: ${{ order.total_after_tax|floatformat:2 }}</strong></p>
 
-    <p>A confirmation email has been sent to {{ user.email }}</p>
-    <a href="{% url 'store_home' %}">Continue Shopping</a>
+        <p class="thanks-note">A confirmation email has been sent to <strong>{{ user.email }}</strong></p>
+
+        <a href="{% url 'store_home' %}" class="return-link">← Continue Shopping</a>
+    </div>
 </body>
 </html>

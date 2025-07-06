@@ -48,7 +48,26 @@
                     <img src="{{ book.cover_image|default:'https://cdn-icons-png.flaticon.com/512/29/29302.png' }}" alt="{{ book.title }}">
                     <h4>{{ book.title }}</h4>
                     <p>by {{ book.author }}</p>
-                    <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a>
+                    <h4><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></h4>
+                    <p class="rating">
+                                {% if book.rating %}
+            {% with book.rating|floatformat:0|add:"0" as stars %}
+                <span class="rating-stars">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= stars %}
+                        ★
+                    {% else %}
+                        ☆
+                    {% endif %}
+                {% endfor %}
+                </span>
+                <span class="rating-number">({{ book.rating }})</span>
+            {% endwith %}
+        {% else %}
+            <span class="no-rating">No rating</span>
+        {% endif %}
+
+                    </p>
                     <button type="button" class="btn btn-primary add-to-cart-btn" data-book-id="{{ book.id }}">Add to Cart</button>
                 </div>
             {% endfor %}
@@ -56,18 +75,37 @@
     </div>
 
     <div class="section collection">
-        <h2>⏳ Coming Soon</h2>
-        <div class="cards book-grid">
-            {% for book in coming_soon_books %}
-                <div class="card book-card">
-                    <img src="{{ book.cover_image|default:'https://cdn-icons-png.flaticon.com/512/29/29302.png' }}" alt="{{ book.title }}">
+    <h2>⏳ Coming Soon</h2>
+    <div class="cards book-grid">
+        {% for book in coming_soon_books %}
+            <div class="card book-card">
+                <img src="{{ book.cover_image|default:'https://cdn-icons-png.flaticon.com/512/29/29302.png' }}" alt="{{ book.title }}">
+                <div class="book-info">
                     <h4>{{ book.title }}</h4>
-                    <p>by {{ book.author }}</p>
-                    <a href="{% url 'book_detail' book.id %}">View Details</a>
+                    <p class="author">by {{ book.author }}</p>
+                    <p class="rating">
+                        {% if book.rating %}
+                            {% with book.rating|floatformat:0 as stars %}
+                                {% for _ in "12345" %}
+                                    {% if forloop.counter <= stars %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="rating-number">({{ book.rating }})</span>
+                            {% endwith %}
+                        {% else %}
+                            <span class="no-rating">No rating</span>
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'book_detail' book.id %}" class="btn btn-detail">View</a>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
     </div>
+</div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

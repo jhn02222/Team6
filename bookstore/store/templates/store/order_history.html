@@ -2,25 +2,139 @@
 <html>
 <head>
     <title>Your Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #b22222;
+            margin-bottom: 30px;
+        }
+
+        .order-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .order-header {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .item-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 10px 0 0 0;
+        }
+
+        .item-list li {
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .reorder-btn {
+            background-color: #b22222;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .reorder-btn:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .reorder-btn:hover:not(:disabled) {
+            background-color: #8a1c1c;
+        }
+
+        .details-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .details-link:hover {
+            text-decoration: underline;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-links a {
+            background-color: #fff;
+            border: 2px solid #b22222;
+            color: #b22222;
+            padding: 10px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #b22222;
+            color: white;
+        }
+    </style>
 </head>
 <body>
+<div class="container">
     <h1>Your Order History</h1>
-{% if orders %}
-    <ul>
-       {% for order in orders %}
-    <li>
-        <strong>Order #{{ order.order_id }}</strong> ({{ order.created_at|date:"Y-m-d H:i" }})<br>
-        <ul>
-            {% for item in order.items.all %}
-                <li>
-                    {{ item.book.title }} x{{ item.quantity }} — ${{ item.price_each|floatformat:2 }}
-                    <button type="button" class="reorder-btn" data-book-id="{{ item.book.id }}">Reorder</button>
-                </li>
-            {% endfor %}
-        </ul>
-        <a href="{% url 'order_confirmation' order.order_id %}">View Details</a>
-    </li>
-{% endfor %}
+
+    {% if orders %}
+        {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    Order #{{ order.order_id }} – {{ order.created_at|date:"Y-m-d H:i" }}
+                </div>
+                <ul class="item-list">
+                    {% for item in order.items.all %}
+                        <li>
+                            {{ item.book.title }} x{{ item.quantity }} — ${{ item.price_each|floatformat:2 }}
+                            <button type="button" class="reorder-btn" data-book-id="{{ item.book.id }}">Reorder</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'order_confirmation' order.order_id %}" class="details-link">View Details</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align:center; font-size: 1.1em;">You have no orders yet.</p>
+    {% endif %}
+
+    <div class="nav-links">
+        <a href="{% url 'store_home' %}">← Back to Home</a>
+        <a href="{% url 'cart_view' %}">🛒 View Cart</a>
+    </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -37,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    // Optionally update cart counter if you have one
                     if (document.getElementById('cart-count')) {
                         document.getElementById('cart-count').textContent = data.cart_count;
                     }
@@ -49,11 +162,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-    </ul>
-{% else %}
-    <p>You have no orders yet.</p>
-{% endif %}
-    <a href="{% url 'store_home' %}">← Back to Home</a>
-    <a href="{% url 'cart_view' %}">View Cart</a>
 </body>
 </html>

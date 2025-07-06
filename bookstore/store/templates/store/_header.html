@@ -1,0 +1,21 @@
+<div class="navbar">
+    <div class="logo"><strong>📚 Online Bookstore</strong></div>
+    <form method="get" action="{% url 'search_books' %}" style="margin:0;">
+        <input type="text" class="search" name="q" placeholder="Search by title, author, or category">
+        <button type="submit" class="btn search-btn">Search</button>
+    </form>
+    <div class="nav-buttons">
+        {% if user.is_authenticated %}
+            {% if not user.is_staff %}
+                <a href="{% url 'profile' %}" class="btn btn-nav">👤 Profile</a>
+                <a href="{% url 'order_history' %}" class="btn btn-nav">📦 Order History</a>
+            {% endif %}
+            <a href="{% url 'cart_view' %}" class="btn btn-nav">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+            <a href="{% url 'logout' %}" class="btn btn-nav">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-nav">Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-nav">Sign Up</a>
+            <a href="{% url 'cart_view' %}" class="btn btn-nav">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+        {% endif %}
+    </div>
+</div>
