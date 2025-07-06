@@ -83,57 +83,73 @@ from django.http import JsonResponse
 
 @login_required
 def cart_view(request):
-    cart_items = CartItem.objects.select_related('book').filter(user=request.user)
+    user = request.user
 
+    # Handle cleanup request from "Back to Homepage" or "Proceed to Checkout"
+    if request.method == 'POST' and request.POST.get('cleanup') == '1':
+        CartItem.objects.filter(user=user, quantity=0).delete()
+        next_url = request.POST.get('next', '/')
+        return redirect(next_url)
+
+    # Handle AJAX updates (quantity changes or removals)
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         item_id = request.POST.get('item_id')
-        quantity = int(request.POST.get('quantity', 1))
+        quantity = int(request.POST.get('quantity', 0))
+
         try:
-            item = CartItem.objects.get(id=item_id, user=request.user)
-            if quantity > 0:
+            item = CartItem.objects.get(id=item_id, user=user)
+            if quantity <= 0:
+                item.delete()
+                cart_total = sum(i.book.selling_price * i.quantity for i in CartItem.objects.filter(user=user))
+                return JsonResponse({'success': True, 'deleted': True, 'cart_total': cart_total})
+            elif quantity <= item.book.quantity_in_stock:
                 item.quantity = quantity
                 item.save()
-                total_price = item.quantity * item.book.selling_price
-                cart_total = sum(ci.book.selling_price * ci.quantity for ci in cart_items)
+                item_total = item.book.selling_price * item.quantity
+                cart_total = sum(i.book.selling_price * i.quantity for i in CartItem.objects.filter(user=user))
                 return JsonResponse({
                     'success': True,
-                    'item_total': round(total_price, 2),
-                    'cart_total': round(cart_total, 2),
+                    'deleted': False,
+                    'item_total': item_total,
+                    'cart_total': cart_total
                 })
             else:
-                item.delete()
-                cart_total = sum(ci.book.selling_price * ci.quantity for ci in CartItem.objects.filter(user=request.user))
-                return JsonResponse({'success': True, 'deleted': True, 'cart_total': round(cart_total, 2)})
+                return JsonResponse({'success': False, 'error': 'Exceeds stock'})
         except CartItem.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Item not found'}, status=404)
+            return JsonResponse({'success': False, 'error': 'Item not found'})
 
+    # Handle normal GET
+    cart_items = CartItem.objects.filter(user=user)
     total = sum(item.book.selling_price * item.quantity for item in cart_items)
-    tax = total * Decimal(0.07)
+    tax = total * Decimal("0.07")
+
     return render(request, 'store/cart.html', {
         'cart_items': cart_items,
         'total': total,
-        'tax': tax + total,
+        'tax': tax,
     })
-
 @login_required
 def checkout_view(request):
     user = request.user
     cart_items = CartItem.objects.filter(user=user)
-    if not cart_items:
+    if not cart_items.exists():
         return redirect('cart_view')
 
-    # Assume user.profile has card_last4 and shipping_address fields (adjust as needed)
     saved_card = user.card_number[-4:] if user.card_number else None
     saved_address = user.shipping_address
+
     if request.method == 'POST':
         address = request.POST.get('address')
         card_last4 = request.POST.get('card_last4')
+
+        # Update user info
         user.shipping_address = address
-        user.card_number = card_last4  # or use a separate field if you have one for last 4 digits
+        user.card_number = card_last4
         user.save()
 
+        # Calculate totals
         total_before = sum(item.book.selling_price * item.quantity for item in cart_items)
-        tax = total_before * Decimal('0.07')
+        tax = total_before * Decimal("0.07")
         total_after = total_before + tax
 
         order = Order.objects.create(
@@ -143,6 +159,8 @@ def checkout_view(request):
             total_before_tax=total_before,
             total_after_tax=total_after
         )
+
+        # Create order items
         for item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -150,8 +168,11 @@ def checkout_view(request):
                 quantity=item.quantity,
                 price_each=item.book.selling_price
             )
+
+        # Clear cart
         cart_items.delete()
-        # TODO: send confirmation email here
+
+        # Redirect to confirmation
         return redirect('order_confirmation', order_id=order.order_id)
 
     return render(request, 'store/checkout.html', {
@@ -159,13 +180,17 @@ def checkout_view(request):
         'saved_card': saved_card,
         'saved_address': saved_address,
     })
+
 @login_required
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, order_id=order_id, user=request.user)  
     order_items = order.items.select_related('book')
+
+    tax = order.total_after_tax - order.total_before_tax
     return render(request, 'store/order_confirmation.html', {
         'order': order,
         'order_items': order_items,
+        'tax': tax
     })
 
 @login_required
@@ -198,4 +223,5 @@ def ajax_add_to_cart(request, book_id):
         total=Sum('quantity')
     )['total'] or 0
     return JsonResponse({'success': True, 'cart_count': cart_count})
+
 

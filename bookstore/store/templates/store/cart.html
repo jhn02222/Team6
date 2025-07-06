@@ -1,3 +1,4 @@
+{% load math_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,6 +89,7 @@
       text-decoration: none;
       font-weight: bold;
       transition: background-color 0.3s ease;
+      cursor: pointer;
     }
 
     .button:hover, a.button:hover {
@@ -133,6 +135,12 @@
   <h2 class="header">Your Shopping Cart</h2>
 
   {% if cart_items %}
+    <form id="cleanupForm" method="POST" action="{% url 'cart_view' %}">
+      {% csrf_token %}
+      <input type="hidden" name="cleanup" value="1">
+      <input type="hidden" id="cleanup-next" name="next" value="">
+    </form>
+
     <table>
       <tr>
         <th>Book</th>
@@ -147,12 +155,14 @@
           <td>${{ item.book.selling_price|floatformat:2 }}</td>
           <td>
             <input type="number" class="qty-input" name="quantity_{{ item.id }}"
-              min="0" value="{{ item.quantity }}"
+              min="0" max="{{ item.book.quantity_in_stock }}"
+              value="{{ item.quantity }}"
               data-item-id="{{ item.id }}" data-price="{{ item.book.selling_price }}">
           </td>
           <td class="total-price" id="total-{{ item.id }}">
-            ${{ item.book.selling_price|floatformat:2|add:"0"|add:item.quantity|floatformat:2 }}
-          </td>
+  ${{ item.book.selling_price|mul:item.quantity|floatformat:2 }}
+</td>
+
           <td>
             <button type="button" class="remove-btn" data-item-id="{{ item.id }}">Remove</button>
           </td>
@@ -166,8 +176,8 @@
     </div>
 
     <div class="actions">
-      <a href="{% url 'checkout_view' %}" class="button">Proceed to Checkout</a>
-      <a href="{% url 'store_home' %}" class="button">Back to Homepage</a>
+      <a href="#" class="button cleanup-btn" data-next-url="{% url 'checkout_view' %}">Proceed to Checkout</a>
+      <a href="#" class="button cleanup-btn" data-next-url="{% url 'store_home' %}">Back to Homepage</a>
     </div>
   {% else %}
     <p class="empty">Your cart is empty.</p>
@@ -185,7 +195,6 @@
           grandTotal += price;
         });
         document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
-
         const tax = grandTotal * 0.07;
         document.getElementById('tax-amount').textContent = tax.toFixed(2);
       }
@@ -193,9 +202,10 @@
       document.querySelectorAll('.qty-input').forEach(input => {
         input.addEventListener('input', () => {
           const itemId = input.dataset.itemId;
-          const quantity = parseInt(input.value) || 0;
-          const price = parseFloat(input.dataset.price);
+          const quantity = Math.min(parseInt(input.value) || 0, parseInt(input.max));
+          input.value = quantity;
 
+          const price = parseFloat(input.dataset.price);
           const itemTotal = quantity * price;
           document.getElementById(`total-${itemId}`).textContent = `$${itemTotal.toFixed(2)}`;
           recalculateGrandTotal();
@@ -211,19 +221,6 @@
               item_id: itemId,
               quantity: quantity
             })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              if (data.deleted) {
-                document.getElementById(`row-${itemId}`).remove();
-                recalculateGrandTotal();
-              } else {
-                document.getElementById(`total-${itemId}`).textContent = `$${data.item_total.toFixed(2)}`;
-                document.getElementById('grand-total').textContent = data.cart_total.toFixed(2);
-                document.getElementById('tax-amount').textContent = (data.cart_total * 0.07).toFixed(2);
-              }
-            }
           });
         });
       });
@@ -231,16 +228,8 @@
       document.querySelectorAll('.remove-btn').forEach(button => {
         button.addEventListener('click', () => {
           const itemId = button.dataset.itemId;
-          const row = document.getElementById(`row-${itemId}`);
-          const totalCell = row.querySelector('.total-price');
-          const itemTotal = parseFloat(totalCell.textContent.replace('$', '')) || 0;
-
-          let grandTotal = parseFloat(document.getElementById('grand-total').textContent) || 0;
-          grandTotal -= itemTotal;
-          document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
-          document.getElementById('tax-amount').textContent = (grandTotal * 0.07).toFixed(2);
-
-          row.remove();
+          document.getElementById(`row-${itemId}`).remove();
+          recalculateGrandTotal();
 
           fetch("{% url 'cart_view' %}", {
             method: "POST",
@@ -253,14 +242,16 @@
               item_id: itemId,
               quantity: 0
             })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success && data.deleted) {
-              document.getElementById('grand-total').textContent = data.cart_total.toFixed(2);
-              document.getElementById('tax-amount').textContent = (data.cart_total * 0.07).toFixed(2);
-            }
           });
+        });
+      });
+
+      document.querySelectorAll('.cleanup-btn').forEach(button => {
+        button.addEventListener('click', e => {
+          e.preventDefault();
+          const nextUrl = button.getAttribute('data-next-url');
+          document.getElementById('cleanup-next').value = nextUrl;
+          document.getElementById('cleanupForm').submit();
         });
       });
     });
