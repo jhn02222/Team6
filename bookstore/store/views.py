@@ -13,6 +13,7 @@ from .models import Book, CartItem, Order, OrderItem
 from django.views.decorators.http import require_POST
 from django.db.models import Sum
 from decimal import Decimal
+from django.contrib import messages
 
 @staff_required
 def add_book(request):
@@ -129,6 +130,7 @@ def cart_view(request):
         'tax': tax,
     })
 @login_required
+@login_required
 def checkout_view(request):
     user = request.user
     cart_items = CartItem.objects.filter(user=user)
@@ -137,6 +139,12 @@ def checkout_view(request):
 
     saved_card = user.card_number[-4:] if user.card_number else None
     saved_address = user.shipping_address
+
+    # 🛡️ Check for stock availability BEFORE creating the order
+    for item in cart_items:
+        if item.quantity > item.book.quantity_in_stock:
+            messages.error(request, f"Not enough stock for '{item.book.title}'. Only {item.book.quantity_in_stock} left.")
+            return redirect('cart_view')
 
     if request.method == 'POST':
         address = request.POST.get('address')
@@ -152,6 +160,7 @@ def checkout_view(request):
         tax = total_before * Decimal("0.07")
         total_after = total_before + tax
 
+        # Create the order
         order = Order.objects.create(
             user=user,
             shipping_address=address,
@@ -160,8 +169,13 @@ def checkout_view(request):
             total_after_tax=total_after
         )
 
-        # Create order items
+        # Create order items and reduce stock
         for item in cart_items:
+            # Reduce stock
+            item.book.quantity_in_stock -= item.quantity
+            item.book.save()
+
+            # Create order item
             OrderItem.objects.create(
                 order=order,
                 book=item.book,
@@ -172,7 +186,6 @@ def checkout_view(request):
         # Clear cart
         cart_items.delete()
 
-        # Redirect to confirmation
         return redirect('order_confirmation', order_id=order.order_id)
 
     return render(request, 'store/checkout.html', {
