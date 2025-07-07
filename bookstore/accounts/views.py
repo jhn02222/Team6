@@ -110,17 +110,28 @@ def unauthorized(request):
 
 
 @custom_login_required
+@custom_login_required
 def profile_view(request):
     user = request.user
+
     if request.method == 'POST':
         profile_form = EditProfileForm(request.POST, instance=user)
         password_form = CustomPasswordChangeForm(user, request.POST)
 
-        if profile_form.is_valid() and password_form.is_valid():
+        if profile_form.is_valid():
             profile_form.save()
-            updated_user = password_form.save()
-            update_session_auth_hash(request, updated_user)
-            messages.success(request, 'Profile and password updated successfully!')
+
+            # Only change password if a new one was entered
+            if request.POST.get('new_password1') or request.POST.get('new_password2'):
+                if password_form.is_valid():
+                    updated_user = password_form.save()
+                    update_session_auth_hash(request, updated_user)
+                    messages.success(request, 'Password updated successfully!')
+                else:
+                    messages.error(request, 'Password change failed.')
+                    return redirect('profile')
+
+            messages.success(request, 'Profile updated successfully!')
             return redirect('profile')
     else:
         profile_form = EditProfileForm(instance=user)
@@ -129,8 +140,9 @@ def profile_view(request):
     return render(request, 'accounts/profile.html', {
         'user': user,
         'profile_form': profile_form,
-        'password_form': password_form
+        'password_form': password_form,
     })
+
 
 
 def logout_view(request):

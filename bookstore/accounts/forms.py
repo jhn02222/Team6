@@ -36,6 +36,30 @@ class EditProfileForm(forms.ModelForm):
         }
 
 class CustomPasswordChangeForm(PasswordChangeForm):
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'input-auth'}))
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'input-auth'}))
-    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'input-auth'}))
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'input-auth'}),
+        required=False
+    )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'input-auth'}),
+        required=False
+    )
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'input-auth'}),
+        required=False
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        old = cleaned_data.get("old_password")
+        new1 = cleaned_data.get("new_password1")
+        new2 = cleaned_data.get("new_password2")
+
+        if new1 or new2:
+            if not old:
+                self.add_error("old_password", "Enter your current password.")
+            if not new1:
+                self.add_error("new_password1", "Enter a new password.")
+            if not new2:
+                self.add_error("new_password2", "Confirm your new password.")
+        return cleaned_data
