@@ -2,55 +2,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Your Profile</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="{% static 'accounts/style.css' %}" />
+<meta charset="UTF-8" />
+<title>Your Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="{% static 'accounts/profile.css' %}" />
+
 </head>
 <body>
-    <header class="navbar">
-        <div class="logo">Bookstore</div>
-        <div class="nav-buttons">
-            <a href="{% url 'store_home' %}" class="btn btn-nav">Home</a>
-            <a href="{% url 'cart_view' %}" class="btn btn-nav">Cart</a>
-            <a href="{% url 'logout' %}" class="btn btn-nav">Logout</a>
-        </div>
-    </header>
+<!-- Add floating shapes for background animation -->
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
 
-    <main class="auth-page">
-        <div class="auth-box" style="max-width: 400px;">
-            <h2>👤 {{ user.username }}'s Profile</h2>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Account ID:</strong> {{ user.id }}</p>
-            {% if user.status %}
-                <p><strong>Status:</strong> {{ user.status }}</p>
-            {% endif %}
-
-            <hr style="margin: 20px 0;">
-
-            <h3>Update Personal & Payment Info</h3>
-            <form method="post">
-                {% csrf_token %}
-                {{ profile_form.as_p }}
-
-                <h3>Change Password</h3>
-                {{ password_form.as_p }}
-
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
-
-            {% if messages %}
-                <ul>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-
-            <p class="link-text" style="margin-top:20px;">
-                <a href="{% url 'store_home' %}">← Back to Home</a>
-            </p>
-        </div>
-    </main>
+<header class="navbar">
+<div class="logo">Bookstore</div>
+<div class="nav-buttons">
+<a href="{% url 'store_home' %}" class="btn btn-nav">Home</a>
+<a href="{% url 'cart_view' %}" class="btn btn-nav">Cart</a>
+<a href="{% url 'logout' %}" class="btn btn-nav">Logout</a>
+</div>
+</header>
+<main class="auth-page">
+<div class="auth-box" style="max-width: 500px;">
+<h2>👤 {{ user.username }}'s Profile</h2>
+<p><strong>Email:</strong> {{ user.email }}</p>
+<p><strong>Account ID:</strong> {{ user.account_id }}</p>
+ {% if user.status %}
+<p><strong>Status:</strong> {{ user.status }}</p>
+ {% endif %}
+<hr style="margin: 20px 0;">
+<h3>Update Personal & Payment Info</h3>
+<form method="post">
+ {% csrf_token %}
+ {{ profile_form.as_p }}
+<h3>Change Password</h3>
+ {{ password_form.as_p }}
+<button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+ {% if messages %}
+<ul>
+ {% for message in messages %}
+<li>{{ message }}</li>
+ {% endfor %}
+</ul>
+ {% endif %}
+<p class="link-text" style="margin-top:20px;">
+<a href="{% url 'store_home' %}">← Back to Home</a>
+</p>
+</div>
+</main>
 </body>
 </html>

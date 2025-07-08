@@ -131,7 +131,10 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
 DOMAIN = config('DOMAIN')
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 LOGIN_URL = '/accounts/login/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "store" / "static"
+]

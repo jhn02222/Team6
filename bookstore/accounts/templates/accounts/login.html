@@ -32,6 +32,8 @@
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Confirm</button>
         <p class="link-text">No Account? <a href="{% url 'signup' %}">Register</a></p>
+        <p class="link-text"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+
       </form>
     </div>
   </main>

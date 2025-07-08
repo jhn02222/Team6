@@ -63,3 +63,14 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             if not new2:
                 self.add_error("new_password2", "Confirm your new password.")
         return cleaned_data
+
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth import get_user_model
+
+class CustomPasswordResetForm(PasswordResetForm):
+    def get_users(self, email):
+        UserModel = get_user_model()
+        return UserModel._default_manager.filter(
+            email__iexact=email,
+            status='Active'  
+        )
