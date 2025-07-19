@@ -5,11 +5,297 @@
 <meta charset="UTF-8" />
 <title>Your Profile</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="stylesheet" href="{% static 'accounts/profile.css' %}" />
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  min-height: 100vh;
+}
 
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+.auth-box {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  padding: 50px 40px;
+  width: 100%;
+  max-width: 550px;
+  border: 1px solid rgba(220, 20, 60, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-box h2 {
+  text-align: center;
+  font-size: 2.2em;
+  font-weight: 800;
+  margin-bottom: 30px;
+  background: linear-gradient(45deg, #DC143C, #FF6B6B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.auth-box form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.auth-box form input, .auth-box form textarea {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 25px;
+  border: 2px solid rgba(220, 20, 60, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: white;
+  font-size: 1em;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.auth-box form input:focus, .auth-box form textarea:focus {
+  outline: none;
+  border-color: #DC143C;
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.3);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(45deg, #DC143C, #FF6B6B);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(220, 20, 60, 0.4);
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(220, 20, 60, 0.3);
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.btn-secondary:hover {
+  background: rgba(220, 20, 60, 0.2);
+  border-color: #DC143C;
+}
+
+.btn-remove {
+  background: rgba(255, 69, 0, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.4);
+  color: #FF6B6B;
+  padding: 8px 16px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-top: 10px;
+}
+
+.btn-remove:hover {
+  background: rgba(255, 69, 0, 0.3);
+}
+
+.navbar {
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(220, 20, 60, 0.3);
+}
+
+.logo {
+  font-size: 1.8em;
+  font-weight: 800;
+  background: linear-gradient(45deg, #DC143C, #FF6B6B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-nav {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(220, 20, 60, 0.3);
+}
+
+.btn-nav:hover {
+  background: rgba(220, 20, 60, 0.2);
+  box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
+  border-color: #DC143C;
+}
+
+.link-text {
+  text-align: center;
+  margin-top: 25px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95em;
+}
+
+.link-text a {
+  color: #DC143C;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.card-section {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  border: 1px solid rgba(220, 20, 60, 0.2);
+}
+
+.card-count {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+.user-info {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(220, 20, 60, 0.2);
+}
+
+.user-info p {
+  margin: 10px 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.user-info strong {
+  color: #FF6B6B;
+}
+
+.floating-shape {
+  position: absolute;
+  background: linear-gradient(45deg, rgba(220, 20, 60, 0.1), rgba(139, 0, 0, 0.1));
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-shape:nth-child(1) {
+  width: 100px;
+  height: 100px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.floating-shape:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  top: 50%;
+  right: 20%;
+  animation-delay: 2s;
+}
+
+.floating-shape:nth-child(3) {
+  width: 80px;
+  height: 80px;
+  bottom: 30%;
+  left: 30%;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.messages {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.messages li {
+  background: rgba(220, 20, 60, 0.1);
+  border: 1px solid rgba(220, 20, 60, 0.3);
+  color: #FF6B6B;
+  padding: 12px 20px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+  backdrop-filter: blur(10px);
+}
+
+h3 {
+  color: white;
+  margin: 25px 0 15px 0;
+  font-size: 1.3em;
+}
+
+hr {
+  margin: 20px 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.hidden-card {
+  display: none;
+}
+
+.existing-card {
+  display: block;
+}
+
+.form-errors {
+  color: #FF6B6B;
+  font-size: 0.9em;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+</style>
 </head>
 <body>
-<!-- Add floating shapes for background animation -->
+<!-- Floating background shapes -->
 <div class="floating-shape"></div>
 <div class="floating-shape"></div>
 <div class="floating-shape"></div>
@@ -17,39 +303,298 @@
 <header class="navbar">
 <div class="logo">Bookstore</div>
 <div class="nav-buttons">
-<a href="{% url 'store_home' %}" class="btn btn-nav">Home</a>
-<a href="{% url 'cart_view' %}" class="btn btn-nav">Cart</a>
-<a href="{% url 'logout' %}" class="btn btn-nav">Logout</a>
+<a href="{% url 'store_home' %}" class="btn-nav">Home</a>
+<a href="{% url 'cart_view' %}" class="btn-nav">Cart</a>
+<a href="{% url 'logout' %}" class="btn-nav">Logout</a>
 </div>
 </header>
+
 <main class="auth-page">
-<div class="auth-box" style="max-width: 500px;">
-<h2>👤 {{ user.username }}'s Profile</h2>
-<p><strong>Email:</strong> {{ user.email }}</p>
-<p><strong>Account ID:</strong> {{ user.account_id }}</p>
- {% if user.status %}
-<p><strong>Status:</strong> {{ user.status }}</p>
- {% endif %}
-<hr style="margin: 20px 0;">
-<h3>Update Personal & Payment Info</h3>
-<form method="post">
- {% csrf_token %}
- {{ profile_form.as_p }}
-<h3>Change Password</h3>
- {{ password_form.as_p }}
-<button type="submit" class="btn btn-primary">Save Changes</button>
-</form>
- {% if messages %}
-<ul>
- {% for message in messages %}
+<div class="auth-box">
+<h2>👤 Profile</h2>
+
+<div class="user-info">
+  <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Account ID:</strong> {{ user.account_id }}</p>
+  {% if user.status %}
+  <p><strong>Status:</strong> {{ user.status }}</p>
+  {% endif %}
+</div>
+
+{% if messages %}
+<ul class="messages">
+{% for message in messages %}
 <li>{{ message }}</li>
- {% endfor %}
+{% endfor %}
 </ul>
- {% endif %}
-<p class="link-text" style="margin-top:20px;">
+{% endif %}
+
+<!-- DEBUG: Display form errors -->
+{% if profile_form.errors or address_form.errors %}
+<div class="form-errors">
+  <h4>Form Errors:</h4>
+  {% if profile_form.errors %}
+    <p>Profile errors: {{ profile_form.errors }}</p>
+  {% endif %}
+  {% if address_form.errors %}
+    <p>Address errors: {{ address_form.errors }}</p>
+  {% endif %}
+  {% for form in card_forms %}
+    {% if form.errors %}
+      <p>Card {{ forloop.counter0 }} errors: {{ form.errors }}</p>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<form method="post">
+{% csrf_token %}
+
+<h3>Update Personal Info</h3>
+<label for="{{ profile_form.first_name.id_for_label }}">First Name:</label>
+{{ profile_form.first_name }}
+{% if profile_form.first_name.errors %}
+  <div class="form-errors">{{ profile_form.first_name.errors }}</div>
+{% endif %}
+
+<label for="{{ profile_form.last_name.id_for_label }}">Last Name:</label>
+{{ profile_form.last_name }}
+{% if profile_form.last_name.errors %}
+  <div class="form-errors">{{ profile_form.last_name.errors }}</div>
+{% endif %}
+
+<label for="{{ profile_form.phone.id_for_label }}">Phone:</label>
+{{ profile_form.phone }}
+{% if profile_form.phone.errors %}
+  <div class="form-errors">{{ profile_form.phone.errors }}</div>
+{% endif %}
+
+<div style="margin-top: 15px;">
+<label for="{{ profile_form.promotions_opt_in.id_for_label }}">
+{{ profile_form.promotions_opt_in }} Register for Promotions
+</label>
+</div>
+
+<h3>Shipping Address</h3>
+<label for="{{ address_form.address_line.id_for_label }}">Street Address:</label>
+{{ address_form.address_line }}
+{% if address_form.address_line.errors %}
+  <div class="form-errors">{{ address_form.address_line.errors }}</div>
+{% endif %}
+
+<label for="{{ address_form.city.id_for_label }}">City:</label>
+{{ address_form.city }}
+{% if address_form.city.errors %}
+  <div class="form-errors">{{ address_form.city.errors }}</div>
+{% endif %}
+
+<label for="{{ address_form.state.id_for_label }}">State:</label>
+{{ address_form.state }}
+{% if address_form.state.errors %}
+  <div class="form-errors">{{ address_form.state.errors }}</div>
+{% endif %}
+
+<label for="{{ address_form.zip_code.id_for_label }}">ZIP Code:</label>
+{{ address_form.zip_code }}
+{% if address_form.zip_code.errors %}
+  <div class="form-errors">{{ address_form.zip_code.errors }}</div>
+{% endif %}
+
+
+<h3>Payment Cards</h3>
+<div class="card-count">You can manage up to 4 payment cards</div>
+
+<div id="card-container">
+  {% for card_form in card_forms %}
+  <div class="card-form card-section {% if card_form.instance.pk %}existing-card{% else %}hidden-card{% endif %}" id="card-form-{{ forloop.counter0 }}">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <strong style="color: white;">
+        {% if card_form.instance.pk %}
+          {{ card_form.instance.card_type }} ending in {{ card_form.instance.card_number|slice:"-4:" }}
+        {% else %}
+          Payment Card {{ forloop.counter }}
+        {% endif %}
+      </strong>
+      <button type="button" class="btn-remove" onclick="removeCard('{{ forloop.counter0 }}', '{{ card_form.instance.pk }}')">Remove</button>
+
+    </div>
+    
+    <label for="{{ card_form.card_type.id_for_label }}">Card Type:</label>
+    {{ card_form.card_type }}
+    {% if card_form.card_type.errors %}
+      <div class="form-errors">{{ card_form.card_type.errors }}</div>
+    {% endif %}
+    
+    <label for="{{ card_form.card_number.id_for_label }}">Card Number:</label>
+    {{ card_form.card_number }}
+    {% if card_form.card_number.errors %}
+      <div class="form-errors">{{ card_form.card_number.errors }}</div>
+    {% endif %}
+    
+    <label for="{{ card_form.expiration_date.id_for_label }}">Expiration Date:</label>
+    {{ card_form.expiration_date }}
+    {% if card_form.expiration_date.errors %}
+      <div class="form-errors">{{ card_form.expiration_date.errors }}</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<button type="button" class="btn-secondary" onclick="addCard()" id="add-card-btn">+ Add Payment Card</button>
+
+<h3>Change Password</h3>
+<label for="{{ password_form.old_password.id_for_label }}">Current Password:</label>
+{{ password_form.old_password }}
+{% if password_form.old_password.errors %}
+  <div class="form-errors">{{ password_form.old_password.errors }}</div>
+{% endif %}
+
+<label for="{{ password_form.new_password1.id_for_label }}">New Password:</label>
+{{ password_form.new_password1 }}
+{% if password_form.new_password1.errors %}
+  <div class="form-errors">{{ password_form.new_password1.errors }}</div>
+{% endif %}
+
+<label for="{{ password_form.new_password2.id_for_label }}">Confirm New Password:</label>
+{{ password_form.new_password2 }}
+{% if password_form.new_password2.errors %}
+  <div class="form-errors">{{ password_form.new_password2.errors }}</div>
+{% endif %}
+
+<button type="submit" class="btn-primary">Save Changes</button>
+</form>
+
+<p class="link-text">
 <a href="{% url 'store_home' %}">← Back to Home</a>
 </p>
 </div>
 </main>
+
+<!-- Add this updated script section to replace the existing script in your template -->
+<script>
+function getCSRFToken() {
+  let name = 'csrftoken';
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function updateCardCount() {
+  cardCount = document.querySelectorAll('.existing-card').length;
+  if (cardCount >= maxCards) {
+    document.getElementById('add-card-btn').style.display = 'none';
+  } else {
+    document.getElementById('add-card-btn').style.display = 'block';
+  }
+}
+
+const maxCards = 4;
+let cardCount = document.querySelectorAll('.existing-card').length;
+
+function addCard() {
+  updateCardCount();
+  if (cardCount >= maxCards) {
+    alert('Maximum 4 payment cards allowed');
+    return;
+  }
+
+  const hiddenCards = document.querySelectorAll('.hidden-card');
+  if (hiddenCards.length > 0) {
+    const cardForm = hiddenCards[0];
+    cardForm.classList.remove('hidden-card');
+    cardForm.classList.add('existing-card');
+
+    const inputs = cardForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.disabled = false;
+      // Re-enable HTML5 validation by restoring required attribute if needed
+      if (input.getAttribute('data-was-required') === 'true') {
+        input.required = true;
+      }
+    });
+  }
+
+  updateCardCount();
+}
+
+function removeCard(cardIndex, cardId) {
+  const cardForm = document.getElementById(`card-form-${cardIndex}`);
+
+  if (!cardId || cardId === "None") {
+    if (cardForm) {
+      cardForm.classList.remove('existing-card');
+      cardForm.classList.add('hidden-card');
+
+      const inputs = cardForm.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.value = '';
+        input.disabled = true;
+        // Store original required state and remove required attribute
+        if (input.required) {
+          input.setAttribute('data-was-required', 'true');
+          input.required = false;
+        }
+      });
+    }
+    updateCardCount();
+    return;
+  }
+
+  fetch(`/accounts/delete-card/${cardId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCSRFToken(),
+    },
+  }).then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        if (cardForm) {
+          cardForm.classList.remove('existing-card');
+          cardForm.classList.add('hidden-card');
+
+          const inputs = cardForm.querySelectorAll('input, select');
+          inputs.forEach(input => {
+            input.value = '';
+            input.disabled = true;
+            // Store original required state and remove required attribute
+            if (input.required) {
+              input.setAttribute('data-was-required', 'true');
+              input.required = false;
+            }
+          });
+        }
+        updateCardCount();
+      } else {
+        alert(data.error || "Failed to delete card.");
+      }
+    });
+}
+
+// ✅ DISABLE all inputs in hidden cards on page load AND remove required attribute
+document.querySelectorAll('.hidden-card').forEach(cardForm => {
+  const inputs = cardForm.querySelectorAll('input, select');
+  inputs.forEach(input => {
+    input.disabled = true;
+    // Store original required state and remove required attribute
+    if (input.required) {
+      input.setAttribute('data-was-required', 'true');
+      input.required = false;
+    }
+  });
+});
+
+updateCardCount();
+</script>
+
 </body>
 </html>

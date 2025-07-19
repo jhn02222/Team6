@@ -88,7 +88,11 @@
     <div class="body-checkout">
         <div class="left-side">
             <h3>Shipping Address</h3>
-            <input type="text" name="address" value="{{ saved_address }}" required class="text-box">
+<input type="text" name="street" placeholder="Street" value="{{ saved_address.street|default_if_none:'' }}" class="text-box" required><br><br>
+<input type="text" name="city" placeholder="City" value="{{ saved_address.city|default_if_none:'' }}" class="text-box" required><br><br>
+<input type="text" name="state" placeholder="State" value="{{ saved_address.state|default_if_none:'' }}" class="text-box" required><br><br>
+<input type="text" name="zip_code" placeholder="Zip Code" value="{{ saved_address.zip_code|default_if_none:'' }}" class="text-box" required><br><br>
+
             <button type="button" onclick="document.querySelector('[name=address]').value=''">Change</button>
 
             <h3>Payment Card</h3>

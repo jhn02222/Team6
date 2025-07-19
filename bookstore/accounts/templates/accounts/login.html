@@ -118,6 +118,28 @@
     color: rgba(255, 255, 255, 0.6);
 }
 
+/* Remember me checkbox styling */
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    gap: 10px;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #DC143C;
+    cursor: pointer;
+}
+
+.remember-me label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9em;
+    cursor: pointer;
+    margin: 0;
+}
+
 .auth-box .btn-primary {
     width: 100%;
     padding: 15px;
@@ -405,7 +427,20 @@
         {% endif %}
         <form method="POST">
             {% csrf_token %}
-            {{ form.as_p }}
+            <p>
+                {{ form.identifier.label_tag }}
+                {{ form.identifier }}
+            </p>
+            <p>
+                {{ form.password.label_tag }}
+                {{ form.password }}
+            </p>
+            
+            <div class="remember-me">
+                {{ form.remember_me }}
+                <label for="{{ form.remember_me.id_for_label }}">{{ form.remember_me.label }}</label>
+            </div>
+            
             <button type="submit" class="btn-primary">Login</button>
             <p class="link-text">No Account? <a href="{% url 'signup' %}">Register</a></p>
             <p class="link-text"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>

@@ -53,7 +53,7 @@
       color: rgba(255, 255, 255, 0.9);
     }
 
-    .auth-box form input {
+    .auth-box form input, .auth-box form textarea, .auth-box form select {
       width: 100%;
       padding: 15px 20px;
       border-radius: 25px;
@@ -66,7 +66,7 @@
       box-sizing: border-box;
     }
 
-    .auth-box form input:focus {
+    .auth-box form input:focus, .auth-box form textarea:focus, .auth-box form select:focus {
       outline: none;
       border-color: #DC143C;
       box-shadow: 0 0 20px rgba(220, 20, 60, 0.3);
@@ -88,6 +88,38 @@
     .btn-primary:hover {
       transform: translateY(-3px);
       box-shadow: 0 10px 25px rgba(220, 20, 60, 0.4);
+    }
+
+    .btn-secondary {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(220, 20, 60, 0.3);
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(220, 20, 60, 0.2);
+      border-color: #DC143C;
+    }
+
+    .btn-remove {
+      background: rgba(255, 69, 0, 0.2);
+      border: 2px solid rgba(255, 69, 0, 0.4);
+      color: #FF6B6B;
+      padding: 8px 16px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
+
+    .btn-remove:hover {
+      background: rgba(255, 69, 0, 0.3);
     }
 
     .navbar {
@@ -145,6 +177,20 @@
       color: #DC143C;
       text-decoration: none;
       font-weight: 600;
+    }
+
+    .card-section {
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      border: 1px solid rgba(220, 20, 60, 0.2);
+    }
+
+    .card-count {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9em;
+      margin-bottom: 10px;
     }
 
     .bg-decoration {
@@ -209,6 +255,48 @@
       font-size: 0.9em;
       backdrop-filter: blur(10px);
     }
+
+    h4 {
+      color: white;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+
+    hr {
+      margin: 25px 0;
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    }
+
+    /* Card visibility classes */
+    .hidden-card {
+      display: none;
+    }
+
+    .existing-card {
+      display: block;
+    }
+
+    .form-errors {
+      color: #FF6B6B;
+      font-size: 0.9em;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+
+    /* Checkbox styling */
+    input[type="checkbox"] {
+      width: auto !important;
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .checkbox-label {
+      display: flex !important;
+      align-items: center;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
@@ -239,14 +327,228 @@
     </ul>
     {% endif %}
 
+    <!-- Display form errors -->
+    {% if form.errors or address_form.errors %}
+    <div class="form-errors">
+      <h4>Form Errors:</h4>
+      {% if form.errors %}
+        <p>User form errors: {{ form.errors }}</p>
+      {% endif %}
+      {% if address_form.errors %}
+        <p>Address errors: {{ address_form.errors }}</p>
+      {% endif %}
+      {% for card_form in card_forms %}
+        {% if card_form.errors %}
+          <p>Card {{ forloop.counter }} errors: {{ card_form.errors }}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <form method="POST">
       {% csrf_token %}
-      {{ form.as_p }}
+
+      <!-- User Info -->
+      <label for="{{ form.email.id_for_label }}">Email:</label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div class="form-errors">{{ form.email.errors }}</div>
+      {% endif %}
+
+      <label for="{{ form.first_name.id_for_label }}">First Name:</label>
+      {{ form.first_name }}
+      {% if form.first_name.errors %}
+        <div class="form-errors">{{ form.first_name.errors }}</div>
+      {% endif %}
+
+      <label for="{{ form.last_name.id_for_label }}">Last Name:</label>
+      {{ form.last_name }}
+      {% if form.last_name.errors %}
+        <div class="form-errors">{{ form.last_name.errors }}</div>
+      {% endif %}
+
+      <label for="{{ form.phone.id_for_label }}">Phone:</label>
+      {{ form.phone }}
+      {% if form.phone.errors %}
+        <div class="form-errors">{{ form.phone.errors }}</div>
+      {% endif %}
+
+      <label for="{{ form.password.id_for_label }}">Password:</label>
+      {{ form.password }}
+      {% if form.password.errors %}
+        <div class="form-errors">{{ form.password.errors }}</div>
+      {% endif %}
+
+      <div class="checkbox-label">
+        {{ form.promotions_opt_in }}
+        <label for="{{ form.promotions_opt_in.id_for_label }}">Register for Promotions</label>
+      </div>
+      {% if form.promotions_opt_in.errors %}
+        <div class="form-errors">{{ form.promotions_opt_in.errors }}</div>
+      {% endif %}
+
+      <hr>
+
+      <!-- Shipping Address -->
+      <h4>Shipping Address</h4>
+      <label for="{{ address_form.address_line.id_for_label }}">Street Address:</label>
+      {{ address_form.address_line }}
+      {% if address_form.address_line.errors %}
+        <div class="form-errors">{{ address_form.address_line.errors }}</div>
+      {% endif %}
+
+      <label for="{{ address_form.city.id_for_label }}">City:</label>
+      {{ address_form.city }}
+      {% if address_form.city.errors %}
+        <div class="form-errors">{{ address_form.city.errors }}</div>
+      {% endif %}
+
+      <label for="{{ address_form.state.id_for_label }}">State:</label>
+      {{ address_form.state }}
+      {% if address_form.state.errors %}
+        <div class="form-errors">{{ address_form.state.errors }}</div>
+      {% endif %}
+
+      <label for="{{ address_form.zip_code.id_for_label }}">ZIP Code:</label>
+      {{ address_form.zip_code }}
+      {% if address_form.zip_code.errors %}
+        <div class="form-errors">{{ address_form.zip_code.errors }}</div>
+      {% endif %}
+
+      <hr>
+
+      <!-- Payment Cards -->
+      <h4>Payment Cards</h4>
+      <div class="card-count">You can add up to 4 payment cards</div>
+      
+      <div id="card-container">
+        {% for card_form in card_forms %}
+        <div class="card-form card-section {% if forloop.first %}existing-card{% else %}hidden-card{% endif %}" id="card-form-{{ forloop.counter0 }}">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <strong style="color: white;">Payment Card {{ forloop.counter }}</strong>
+            {% if not forloop.first %}
+            <button type="button" class="btn-remove" onclick="removeCard('{{ forloop.counter0 }}')">Remove</button>
+            {% endif %}
+          </div>
+
+          <label for="{{ card_form.card_type.id_for_label }}">Card Type:</label>
+          {{ card_form.card_type }}
+          {% if card_form.card_type.errors %}
+            <div class="form-errors">{{ card_form.card_type.errors }}</div>
+          {% endif %}
+
+          <label for="{{ card_form.card_number.id_for_label }}">Card Number:</label>
+          {{ card_form.card_number }}
+          {% if card_form.card_number.errors %}
+            <div class="form-errors">{{ card_form.card_number.errors }}</div>
+          {% endif %}
+
+          <label for="{{ card_form.expiration_date.id_for_label }}">Expiration Date:</label>
+          {{ card_form.expiration_date }}
+          {% if card_form.expiration_date.errors %}
+            <div class="form-errors">{{ card_form.expiration_date.errors }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="button" class="btn-secondary" onclick="addCard()" id="add-card-btn">+ Add Payment Card</button>
+
       <button type="submit" class="btn-primary">Sign Up</button>
     </form>
 
     <p class="link-text">Already have an account? <a href="{% url 'login' %}">Login</a></p>
   </div>
 </main>
+
+<script>
+function updateCardCount() {
+  cardCount = document.querySelectorAll('.existing-card').length;
+  if (cardCount >= maxCards) {
+    document.getElementById('add-card-btn').style.display = 'none';
+  } else {
+    document.getElementById('add-card-btn').style.display = 'block';
+  }
+}
+
+const maxCards = 4;
+let cardCount = document.querySelectorAll('.existing-card').length;
+
+function addCard() {
+  updateCardCount();
+  if (cardCount >= maxCards) {
+    alert('Maximum 4 payment cards allowed');
+    return;
+  }
+
+  const hiddenCards = document.querySelectorAll('.hidden-card');
+  if (hiddenCards.length > 0) {
+    const cardForm = hiddenCards[0];
+    cardForm.classList.remove('hidden-card');
+    cardForm.classList.add('existing-card');
+
+    // Enable all inputs in this card form
+    const inputs = cardForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.disabled = false;
+      // Re-enable HTML5 validation by restoring required attribute if needed
+      if (input.getAttribute('data-was-required') === 'true') {
+        input.required = true;
+      }
+    });
+
+    // Show the remove button for this card (except for the first card)
+    const removeBtn = cardForm.querySelector('.btn-remove');
+    if (removeBtn) {
+      removeBtn.style.display = 'block';
+    }
+  }
+
+  updateCardCount();
+}
+
+function removeCard(cardIndex) {
+  // Don't allow removing the first card
+  if (cardIndex === '0') {
+    return;
+  }
+
+  const cardForm = document.getElementById(`card-form-${cardIndex}`);
+  if (cardForm) {
+    cardForm.classList.remove('existing-card');
+    cardForm.classList.add('hidden-card');
+
+    // Clear and disable all inputs in this card form
+    const inputs = cardForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.value = '';
+      input.disabled = true;
+      // Store original required state and remove required attribute
+      if (input.required) {
+        input.setAttribute('data-was-required', 'true');
+        input.required = false;
+      }
+    });
+  }
+
+  updateCardCount();
+}
+
+// Initialize: disable all inputs in hidden cards on page load
+document.querySelectorAll('.hidden-card').forEach(cardForm => {
+  const inputs = cardForm.querySelectorAll('input, select');
+  inputs.forEach(input => {
+    input.disabled = true;
+    // Store original required state and remove required attribute
+    if (input.required) {
+      input.setAttribute('data-was-required', 'true');
+      input.required = false;
+    }
+  });
+});
+
+// Initialize card count
+updateCardCount();
+</script>
 </body>
 </html>

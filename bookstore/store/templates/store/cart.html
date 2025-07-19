@@ -417,9 +417,18 @@
         </div>
         
         <div class="actions">
-          <a href="#" class="btn btn-primary cleanup-btn" data-next-url="{% url 'checkout_view' %}">
-            🚀 Proceed to Checkout
-          </a>
+          {% if is_guest %}
+  <a href="{% url 'login' %}?next={% url 'checkout_view' %}" class="btn btn-primary">
+    🚀 Log in to Checkout
+  </a>
+{% else %}
+  <form method="post" action="{% url 'cart_view' %}" style="display:inline;">
+    {% csrf_token %}
+    <input type="hidden" name="cleanup" value="1">
+    <input type="hidden" name="next" value="{% url 'checkout_view' %}">
+    <button type="submit" class="btn btn-primary">🚀 Proceed to Checkout</button>
+  </form>
+{% endif %}
           <a href="#" class="btn btn-secondary cleanup-btn" data-next-url="{% url 'store_home' %}">
             ← Continue Shopping
           </a>

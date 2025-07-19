@@ -119,6 +119,7 @@ DATABASES = {
         'PASSWORD': 'ixFHqcMILNmevtGQMUIiCPvzaKalwHPo',
         'HOST': 'switchyard.proxy.rlwy.net',
         'PORT': '44194',
+        
     }
 }
 
@@ -135,6 +136,16 @@ STATIC_URL = '/static/'
 
 LOGIN_URL = '/accounts/login/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / "store" / "static"
-]
+# expire the session cookie when the browser is closed
+# Session Configuration
+SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds (only used when remember_me is True)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  
+SESSION_SAVE_EVERY_REQUEST = False  # Don't refresh session on each request
+SESSION_COOKIE_NAME = 'sessionid'  # Default Django session cookie name
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+
+# Use database sessions for better control
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+

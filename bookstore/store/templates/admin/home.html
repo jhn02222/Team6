@@ -1,93 +1,475 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Online Bookstore</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; padding: 0; 
-            background-color: #B02929; 
-            
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated background elements */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(220, 20, 60, 0.1), rgba(139, 0, 0, 0.1));
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 15%;
+            left: 8%;
+            animation-delay: 0s;
+        }
+
+        .floating-shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .floating-shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 25%;
+            left: 25%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Navbar */
         .navbar {
-            background-color: black;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(220, 20, 60, 0.3);
+        }
+
+        .navbar .logo {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(220, 20, 60, 0.5);
+        }
+
+        .logout-form {
+            display: inline;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
             color: white;
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-        }
-        .navbar a {
-            color: white; 
-            margin-left: 15px; 
-            text-decoration: none;
-        }
-        .section { 
-            padding:0; 
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .body-buttons {
-            background-color: #B02929;
-            grid-template-columns: 1fr 1fr 1fr;
+        .logout-btn:hover {
+            background: rgba(220, 20, 60, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
+        }
+
+        /* Header Section */
+        .header-section {
+            padding: 60px 40px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="admin" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="none"/><text x="50" y="50" text-anchor="middle" font-size="40" fill="rgba(220,20,60,0.03)">⚙️</text></pattern></defs><rect width="100" height="100" fill="url(%23admin)"/></svg>');
+            animation: bgMove 25s linear infinite;
+        }
+
+        @keyframes bgMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-content h1 {
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B, #FFB347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(220, 20, 60, 0.3);
+        }
+
+        .header-content p {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Admin Controls Section */
+        .admin-section {
+            padding: 80px 40px;
+            position: relative;
+        }
+
+        .admin-grid {
             display: grid;
-            align-items: center;
-            justify-items: center;
-            height: 600px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .add-books-button, .manage-users-button, .manage-promotions-button{
-            background-color: white;
-            width: 200px;
-            height: 200px;
-            padding: 20px;
+        .admin-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(220, 20, 60, 0.2);
+            backdrop-filter: blur(15px);
+            position: relative;
+            cursor: pointer;
             text-decoration: none;
-            border-radius: 10px;
-            border: 2px solid black;
-            font-weight: bold;
+            color: inherit;
+            padding: 40px 30px;
+            text-align: center;
+            min-height: 220px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: black;
+        }
+
+        .admin-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(220, 20, 60, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .admin-card:hover::before {
+            opacity: 1;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(220, 20, 60, 0.3);
+            border-color: #DC143C;
+        }
+
+        .card-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(220, 20, 60, 0.3));
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .card-description {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(139, 0, 0, 0.05) 100%);
+            border-radius: 30px;
+            margin: 40px;
+            padding: 60px 40px;
+            border: 1px solid rgba(220, 20, 60, 0.2);
+        }
+
+        .stats-title {
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .header {
-            background-color: white;
-            margin: 0;
-            padding: 10px;
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
         }
 
+        .stats-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            border-radius: 2px;
+        }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid rgba(220, 20, 60, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(220, 20, 60, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 900;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .header-content h1 {
+                font-size: 2.2em;
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .admin-section {
+                padding: 60px 20px;
+            }
+
+            .stats-section {
+                margin: 20px;
+                padding: 40px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        /* Animation for cards */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .admin-card {
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .admin-card:nth-child(1) { animation-delay: 0.1s; }
+        .admin-card:nth-child(2) { animation-delay: 0.2s; }
+        .admin-card:nth-child(3) { animation-delay: 0.3s; }
     </style>
 </head>
 <body>
+    <!-- Animated background -->
+    <div class="bg-decoration">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
 
+    <!-- Navbar -->
     <div class="navbar">
+        <div class="logo">⚙️ Admin Panel</div>
         <div>
-            <strong>⚙️ Admin Panel</strong>
-        </div>
-        <div>
-            <a href="{% url 'logout' %}">Logout</a>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
         </div>
     </div>
 
-    <div class="section">
-        <h1 class="header">Welcome, Admin!</h1>
-        <p class="header">This is the admin dashboard. You can manage books, users, and promotions here.</p>
-        <div class="body-buttons">
-                <div class="add-books"> 
-                    <a href="{% url 'add_book' %}" class="add-books-button">➕ Add Book</a>
-                </div>
-                <div class="manage-users">
-                    <a href="{% url 'manage_users' %}" class="manage-users-button">👥 Manage Users</a>
-                </div>
-                <div class="manage-promotions">
-                     <a href="{% url 'manage_promotions' %}" class="manage-promotions-button">🎯 Manage Promotions</a>
-                </div>
-           
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-content">
+            <h1>Welcome, Admin!</h1>
+            <p>Manage your online bookstore with powerful administrative tools. Control inventory, users, and promotions from this centralized dashboard.</p>
+        </div>
+    </div>
+
+    <!-- Admin Controls Section -->
+    <div class="admin-section">
+        <div class="admin-grid">
+            <a href="{% url 'add_book' %}" class="admin-card">
+                <div class="card-icon">📚</div>
+                <div class="card-title">Add Books</div>
+                <div class="card-description">Add new books to your inventory, manage existing titles, and update book information</div>
+            </a>
+
+            <a href="{% url 'manage_users' %}" class="admin-card">
+                <div class="card-icon">👥</div>
+                <div class="card-title">Manage Users</div>
+                <div class="card-description">View and manage user accounts, permissions, and customer information</div>
+            </a>
+
+            <a href="{% url 'manage_promotions' %}" class="admin-card">
+                <div class="card-icon">🎯</div>
+                <div class="card-title">Manage Promotions</div>
+                <div class="card-description">Create and manage promotional campaigns, discounts, and special offers</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Section -->
+    <div class="stats-section">
+        <h2 class="stats-title">📊 Quick Stats</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">1,247</div>
+                <div class="stat-label">Total Books</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-number">892</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">156</div>
+                <div class="stat-label">Orders Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">$12.5k</div>
+                <div class="stat-label">Revenue</div>
+            </div>
+        </div>
     </div>
 
+    <script>
+        // Add intersection observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all stat cards
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Add hover effect sounds (optional)
+        document.querySelectorAll('.admin-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
 </body>
 </html>

@@ -21,7 +21,7 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('admin') 
+            return redirect('admin_home') 
     else:
         form = BookForm()
     return render(request, 'admin/add_book.html', {'form': form})
@@ -69,67 +69,112 @@ def book_detail(request, book_id):
     return render(request, 'store/book_detail.html', {'book': book})
 
 
+from django.contrib.sessions.backends.db import SessionStore
+
 def add_to_cart(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
-    # Always start at quantity 1
-    cart_item, _ = CartItem.objects.update_or_create(
-        user=request.user,
-        book=book,
-        defaults={'quantity': 1}
-    )
+    if request.user.is_authenticated:
+        # Authenticated: use the database
+        cart_item, _ = CartItem.objects.update_or_create(
+            user=request.user,
+            book=book,
+            defaults={'quantity': 1}
+        )
+    else:
+        # Anonymous user: use session
+        cart = request.session.get('cart', {})
+        book_id_str = str(book_id)
+        cart[book_id_str] = cart.get(book_id_str, 0) + 1
+        request.session['cart'] = cart
+
     return redirect('cart_view')
 
 from django.http import JsonResponse
 
-@login_required
+
+from django.views.decorators.http import require_http_methods
+from django.utils.http import url_has_allowed_host_and_scheme
+
+@require_http_methods(["GET", "POST"])
 def cart_view(request):
-    user = request.user
+    cart_items = []
+    total = 0
+    next_url = request.POST.get('next') or request.GET.get('next')
 
-    # Handle cleanup request from "Back to Homepage" or "Proceed to Checkout"
-    if request.method == 'POST' and request.POST.get('cleanup') == '1':
-        CartItem.objects.filter(user=user, quantity=0).delete()
-        next_url = request.POST.get('next', '/')
-        return redirect(next_url)
+    # Handle POST requests: update or remove items or clean up
+    if request.method == 'POST':
+        item_id = request.POST.get("item_id")
+        quantity = request.POST.get("quantity")
+        cleanup = request.POST.get("cleanup")
 
-    # Handle AJAX updates (quantity changes or removals)
-    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        item_id = request.POST.get('item_id')
-        quantity = int(request.POST.get('quantity', 0))
+        # Update or remove item quantity
+        if item_id is not None and quantity is not None:
+            try:
+                book = Book.objects.get(id=int(item_id))
+                quantity = int(quantity)
 
-        try:
-            item = CartItem.objects.get(id=item_id, user=user)
-            if quantity <= 0:
-                item.delete()
-                cart_total = sum(i.book.selling_price * i.quantity for i in CartItem.objects.filter(user=user))
-                return JsonResponse({'success': True, 'deleted': True, 'cart_total': cart_total})
-            elif quantity <= item.book.quantity_in_stock:
-                item.quantity = quantity
-                item.save()
-                item_total = item.book.selling_price * item.quantity
-                cart_total = sum(i.book.selling_price * i.quantity for i in CartItem.objects.filter(user=user))
-                return JsonResponse({
-                    'success': True,
-                    'deleted': False,
-                    'item_total': item_total,
-                    'cart_total': cart_total
-                })
-            else:
-                return JsonResponse({'success': False, 'error': 'Exceeds stock'})
-        except CartItem.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Item not found'})
+                if request.user.is_authenticated:
+                    if quantity > 0:
+                        CartItem.objects.update_or_create(
+                            user=request.user,
+                            book=book,
+                            defaults={'quantity': quantity}
+                        )
+                    else:
+                        CartItem.objects.filter(user=request.user, book=book).delete()
+                else:
+                    cart = request.session.get('cart', {})
+                    if quantity > 0:
+                        cart[str(book.id)] = quantity
+                    elif str(book.id) in cart:
+                        del cart[str(book.id)]
+                    request.session['cart'] = cart
 
-    # Handle normal GET
-    cart_items = CartItem.objects.filter(user=user)
-    total = sum(item.book.selling_price * item.quantity for item in cart_items)
+                if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                    return JsonResponse({'success': True})
+
+            except Book.DoesNotExist:
+                pass
+
+        # Handle "cleanup" form (e.g. on proceed to checkout or continue shopping)
+        elif cleanup:
+            # Save updated cart or do nothing for now
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
+            return redirect('cart_view')
+
+    # Handle GET request or POST fallback
+    if request.user.is_authenticated:
+        cart_items = CartItem.objects.filter(user=request.user)
+        total = sum(item.book.selling_price * item.quantity for item in cart_items)
+    else:
+        session_cart = request.session.get('cart', {})
+        for book_id_str, quantity in session_cart.items():
+            try:
+                book = Book.objects.get(id=int(book_id_str))
+                subtotal = book.selling_price * quantity
+                total += subtotal
+                cart_items.append(type('SessionCartItem', (), {
+                    'book': book,
+                    'quantity': quantity,
+                    'subtotal': subtotal
+                })())
+            except Book.DoesNotExist:
+                continue
+
     tax = total * Decimal("0.07")
 
     return render(request, 'store/cart.html', {
         'cart_items': cart_items,
         'total': total,
         'tax': tax,
+        'is_guest': not request.user.is_authenticated
     })
-@login_required
+
+
+from bookstore.accounts.models import Address, PaymentCard  # update if needed
+
 @login_required
 def checkout_view(request):
     user = request.user
@@ -137,45 +182,66 @@ def checkout_view(request):
     if not cart_items.exists():
         return redirect('cart_view')
 
-    saved_card = user.card_number[-4:] if user.card_number else None
-    saved_address = user.shipping_address
+    # Retrieve saved address if it exists
+    if hasattr(user, 'address'):
+        address = user.address
+        saved_address = {
+            'street': address.street,
+            'city': address.city,
+            'state': address.state,
+            'zip_code': address.zip_code,
+        }
+    else:
+        saved_address = {}
 
-    # 🛡️ Check for stock availability BEFORE creating the order
+    # Retrieve saved card info if available
+    user_cards = user.cards.all()  # assuming related_name="cards"
+    saved_card = user_cards[0].last4 if user_cards.exists() else None
+
+    # Stock check
     for item in cart_items:
         if item.quantity > item.book.quantity_in_stock:
             messages.error(request, f"Not enough stock for '{item.book.title}'. Only {item.book.quantity_in_stock} left.")
             return redirect('cart_view')
 
     if request.method == 'POST':
-        address = request.POST.get('address')
+        # Collect shipping info from form
+        street = request.POST.get('street')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        zip_code = request.POST.get('zip_code')
         card_last4 = request.POST.get('card_last4')
 
-        # Update user info
-        user.shipping_address = address
-        user.card_number = card_last4
-        user.save()
+        # Save or update address
+        Address.objects.update_or_create(
+            user=user,
+            defaults={
+                'street': street,
+                'city': city,
+                'state': state,
+                'zip_code': zip_code
+            }
+        )
 
-        # Calculate totals
+        # Optional: Save last 4 digits to Order only (not to user model for security)
         total_before = sum(item.book.selling_price * item.quantity for item in cart_items)
         tax = total_before * Decimal("0.07")
         total_after = total_before + tax
 
-        # Create the order
+        # Create Order
         order = Order.objects.create(
             user=user,
-            shipping_address=address,
+            shipping_address=f"{street}, {city}, {state} {zip_code}",
             payment_card_last4=card_last4,
             total_before_tax=total_before,
             total_after_tax=total_after
         )
 
-        # Create order items and reduce stock
+        # Order items and stock update
         for item in cart_items:
-            # Reduce stock
             item.book.quantity_in_stock -= item.quantity
             item.book.save()
 
-            # Create order item
             OrderItem.objects.create(
                 order=order,
                 book=item.book,
@@ -183,15 +249,13 @@ def checkout_view(request):
                 price_each=item.book.selling_price
             )
 
-        # Clear cart
         cart_items.delete()
-
         return redirect('order_confirmation', order_id=order.order_id)
 
     return render(request, 'store/checkout.html', {
         'cart_items': cart_items,
-        'saved_card': saved_card,
         'saved_address': saved_address,
+        'saved_card': saved_card,
     })
 
 @login_required
@@ -223,18 +287,32 @@ from django.http import JsonResponse
 @require_POST
 def ajax_add_to_cart(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    cart_item, created = CartItem.objects.get_or_create(
-        user=request.user,
-        book=book,
-        defaults={'quantity': 1}
-    )
-    if not created:
-        cart_item.quantity += 1
-        cart_item.save()
-    # Get new cart count
-    cart_count = CartItem.objects.filter(user=request.user).aggregate(
-        total=Sum('quantity')
-    )['total'] or 0
+
+    if request.user.is_authenticated:
+        # Add to DB cart
+        cart_item, created = CartItem.objects.get_or_create(
+            user=request.user,
+            book=book,
+            defaults={'quantity': 1}
+        )
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+
+        # Get updated count
+        cart_count = CartItem.objects.filter(user=request.user).aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+    else:
+        # Add to session cart
+        session_cart = request.session.get('cart', {})
+        book_id_str = str(book_id)
+        session_cart[book_id_str] = session_cart.get(book_id_str, 0) + 1
+        request.session['cart'] = session_cart
+
+        cart_count = sum(session_cart.values())
+
     return JsonResponse({'success': True, 'cart_count': cart_count})
+
 
 
