@@ -373,7 +373,7 @@
       <div class="cart-content">
         <div class="cart-items">
           {% for item in cart_items %}
-            <div class="cart-item" id="row-{{ item.id }}">
+            <div class="cart-item" id="row-{{ item.book.id }}">
               <div class="book-info">
                 <div class="book-cover">📖</div>
                 <div>
@@ -383,20 +383,19 @@
               </div>
               
               <div class="quantity-controls">
-                <button type="button" class="qty-btn" onclick="changeQuantity('{{ item.id }}', -1)">−</button>
-                <input type="number" class="qty-input" name="quantity_{{ item.id }}"
-  min="0" max="{{ item.book.quantity_in_stock }}"
-  value="{{ item.quantity }}"
-                  data-item-id="{{ item.id }}" data-price="{{ item.book.selling_price }}">
-                  <button type="button" class="qty-btn" onclick="changeQuantity('{{ item.id }}', 1)">+</button>
-
+                <button type="button" class="qty-btn" onclick="changeQuantity('{{ item.book.id }}', -1)">−</button>
+                <input type="number" class="qty-input" name="quantity_{{ item.book.id }}"
+                       min="0" max="{{ item.book.quantity_in_stock }}"
+                       value="{{ item.quantity }}"
+                       data-item-id="{{ item.book.id }}" data-price="{{ item.book.selling_price }}">
+                <button type="button" class="qty-btn" onclick="changeQuantity('{{ item.book.id }}', 1)">+</button>
               </div>
               
-              <div class="item-total" id="total-{{ item.id }}">
+              <div class="item-total" id="total-{{ item.book.id }}">
                 ${{ item.book.selling_price|mul:item.quantity|floatformat:2 }}
               </div>
               
-              <button type="button" class="remove-btn" data-item-id="{{ item.id }}">🗑️ Remove</button>
+              <button type="button" class="remove-btn" data-item-id="{{ item.book.id }}">🗑️ Remove</button>
             </div>
           {% endfor %}
         </div>
@@ -418,17 +417,17 @@
         
         <div class="actions">
           {% if is_guest %}
-  <a href="{% url 'login' %}?next={% url 'checkout_view' %}" class="btn btn-primary">
-    🚀 Log in to Checkout
-  </a>
-{% else %}
-  <form method="post" action="{% url 'cart_view' %}" style="display:inline;">
-    {% csrf_token %}
-    <input type="hidden" name="cleanup" value="1">
-    <input type="hidden" name="next" value="{% url 'checkout_view' %}">
-    <button type="submit" class="btn btn-primary">🚀 Proceed to Checkout</button>
-  </form>
-{% endif %}
+            <a href="{% url 'login' %}?next={% url 'checkout_view' %}" class="btn btn-primary">
+              🚀 Log in to Checkout
+            </a>
+          {% else %}
+            <form method="post" action="{% url 'cart_view' %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="cleanup" value="1">
+              <input type="hidden" name="next" value="{% url 'checkout_view' %}">
+              <button type="submit" class="btn btn-primary">🚀 Proceed to Checkout</button>
+            </form>
+          {% endif %}
           <a href="#" class="btn btn-secondary cleanup-btn" data-next-url="{% url 'store_home' %}">
             ← Continue Shopping
           </a>
@@ -448,34 +447,57 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Check if cart is empty and reload if needed
+      function checkCartEmpty() {
+        const cartItems = document.querySelectorAll('.cart-item');
+        if (cartItems.length === 0) {
+          window.location.reload();
+        }
+      }
+
       function recalculateGrandTotal() {
         let grandTotal = 0;
         document.querySelectorAll('.item-total').forEach(td => {
           const price = parseFloat(td.textContent.replace('$', '')) || 0;
           grandTotal += price;
         });
-        document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
+        
+        const grandTotalElement = document.getElementById('grand-total');
+        const taxElement = document.getElementById('tax-amount');
+        const finalTotalElement = document.getElementById('final-total');
+        
+        if (grandTotalElement) grandTotalElement.textContent = grandTotal.toFixed(2);
+        
         const tax = grandTotal * 0.07;
-        document.getElementById('tax-amount').textContent = tax.toFixed(2);
+        if (taxElement) taxElement.textContent = tax.toFixed(2);
+        
         const finalTotal = grandTotal + tax;
-        document.getElementById('final-total').textContent = finalTotal.toFixed(2);
+        if (finalTotalElement) finalTotalElement.textContent = finalTotal.toFixed(2);
       }
 
-      window.changeQuantity = function(itemId, change) {
-        const input = document.querySelector(`input[data-item-id="${itemId}"]`);
+      window.changeQuantity = function(bookId, change) {
+        const input = document.querySelector(`input[data-item-id="${bookId}"]`);
+        if (!input) return;
+        
         const currentValue = parseInt(input.value) || 0;
         const maxValue = parseInt(input.max);
         const newValue = Math.max(0, Math.min(maxValue, currentValue + change));
         
         input.value = newValue;
-        updateItemTotal(itemId, newValue);
+        updateItemTotal(bookId, newValue);
       };
 
-      function updateItemTotal(itemId, quantity) {
-        const input = document.querySelector(`input[data-item-id="${itemId}"]`);
+      function updateItemTotal(bookId, quantity) {
+        const input = document.querySelector(`input[data-item-id="${bookId}"]`);
+        if (!input) return;
+        
         const price = parseFloat(input.dataset.price);
         const itemTotal = quantity * price;
-        document.getElementById(`total-${itemId}`).textContent = `$${itemTotal.toFixed(2)}`;
+        const totalElement = document.getElementById(`total-${bookId}`);
+        if (totalElement) {
+          totalElement.textContent = `$${itemTotal.toFixed(2)}`;
+        }
+        
         recalculateGrandTotal();
 
         // Send update to server
@@ -487,48 +509,41 @@
             "X-Requested-With": "XMLHttpRequest"
           },
           body: new URLSearchParams({
-            item_id: itemId,
+            item_id: bookId,  // This is now the book ID, which works for both DB and session carts
             quantity: quantity
           })
-        });
+        }).then(response => response.json())
+          .then(data => {
+            if (data.success && quantity === 0) {
+              // Remove the row from DOM if quantity is 0
+              const row = document.getElementById(`row-${bookId}`);
+              if (row) {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-100%)';
+                setTimeout(() => {
+                  row.remove();
+                  checkCartEmpty();
+                }, 300);
+              }
+            }
+          })
+          .catch(error => console.error('Error:', error));
       }
 
       document.querySelectorAll('.qty-input').forEach(input => {
         input.addEventListener('input', () => {
-          const itemId = input.dataset.itemId;
+          const bookId = input.dataset.itemId;
           const quantity = Math.min(parseInt(input.value) || 0, parseInt(input.max));
           input.value = quantity;
-          updateItemTotal(itemId, quantity);
+          updateItemTotal(bookId, quantity);
         });
       });
 
       document.querySelectorAll('.remove-btn').forEach(button => {
         button.addEventListener('click', () => {
-          const itemId = button.dataset.itemId;
-          const row = document.getElementById(`row-${itemId}`);
-          
-          // Add fade out animation
-          row.style.transition = 'all 0.3s ease';
-          row.style.opacity = '0';
-          row.style.transform = 'translateX(-100%)';
-          
-          setTimeout(() => {
-            row.remove();
-            recalculateGrandTotal();
-          }, 300);
-
-          fetch("{% url 'cart_view' %}", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              "X-CSRFToken": "{{ csrf_token }}",
-              "X-Requested-With": "XMLHttpRequest"
-            },
-            body: new URLSearchParams({
-              item_id: itemId,
-              quantity: 0
-            })
-          });
+          const bookId = button.dataset.itemId;
+          updateItemTotal(bookId, 0);  // This will trigger the removal
         });
       });
 
