@@ -1,170 +1,724 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="{% static 'store/styles.css' %}">
-    <title>Search Results</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Online Bookstore</title>
+    <link rel="stylesheet" href="{% static 'store/bookstore.css' %}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+            min-height: 100vh;
+            color: #fff;
         }
 
-        h1 {
-            color: #b22222;
-            text-align: center;
-            margin-bottom: 30px;
+        /* Animated background */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
         }
 
-        .book-grid {
+        .floating-shape {
+            position: absolute;
+            background: rgba(220, 20, 60, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 70%;
+            right: 10%;
+            animation-delay: 7s;
+        }
+
+        .floating-shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 70%;
+            animation-delay: 14s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(220, 20, 60, 0.2);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: rgba(40, 40, 40, 0.9);
+            border-radius: 50px;
+            padding: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(220, 20, 60, 0.3);
+        }
+
+        .search-container:focus-within {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .search {
+            border: none;
+            outline: none;
+            padding: 12px 20px;
+            width: 400px;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: transparent;
+            color: #fff;
+        }
+
+        .search::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-btn {
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-nav {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .btn-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-nav:hover::before {
+            left: 100%;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(220, 20, 60, 0.2);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #DC143C, #FF6B6B, #FF4757, #C44569);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .search-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .search-stats {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .query-highlight {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Book Grid */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
         }
 
         .book-card {
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 15px;
-            width: 200px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(220, 20, 60, 0.1);
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #DC143C, #FF6B6B);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
         .book-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-card:hover::before {
+            transform: scaleX(1);
         }
 
         .book-card img {
             width: 100%;
-            height: 250px;
+            height: 300px;
             object-fit: cover;
-            border-radius: 6px;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .book-card:hover img {
+            transform: scale(1.03);
+        }
+
+        .book-info {
+            text-align: center;
         }
 
         .book-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin: 10px 0 5px;
-            color: #333;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        .book-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .book-title a:hover {
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .book-author {
-            font-size: 0.95em;
-            color: #666;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
         }
 
         .book-genre {
-            font-size: 0.85em;
-            color: #888;
-            margin-bottom: 10px;
+            display: inline-block;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .rating {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .rating-stars {
+            color: #FFD700;
+            font-size: 1.1rem;
+        }
+
+        .rating-number {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .no-rating {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
         }
 
         .details-link {
-            display: inline-block;
-            margin-top: 8px;
-            background-color: #b22222;
+            background: linear-gradient(45deg, #C44569, #FF4757);
             color: white;
-            padding: 6px 12px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 25px;
             text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.2s ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .details-link:hover {
-            background-color: #8a1c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(196, 69, 105, 0.4);
         }
 
+        .add-to-cart-btn {
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .add-to-cart-btn:disabled {
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* No Results */
         .no-results {
             text-align: center;
-            font-size: 1.1em;
-            color: #777;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFB8B8 100%);
+            border-radius: 16px;
+            margin: 2rem 0;
         }
 
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .no-results p {
+            color: #777;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Back Link */
         .back-link {
-            display: block;
-            margin: 30px auto 0;
-            text-align: center;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            color: white;
             text-decoration: none;
-            color: #b22222;
-            font-size: 1em;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .back-link:hover {
-            text-decoration: underline;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .back-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .back-link:hover::before {
+            left: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .search {
+                width: 250px;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .search-header h1 {
+                font-size: 2rem;
+            }
+
+            .book-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .book-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Animation for page load */
+        .book-card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .book-card:nth-child(1) { animation-delay: 0.1s; }
+        .book-card:nth-child(2) { animation-delay: 0.2s; }
+        .book-card:nth-child(3) { animation-delay: 0.3s; }
+        .book-card:nth-child(4) { animation-delay: 0.4s; }
+        .book-card:nth-child(5) { animation-delay: 0.5s; }
+        .book-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #cart-count {
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            color: white;
+            border-radius: 50%;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            min-width: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    {% include 'store/_header.html' %}
+    <!-- Animated background -->
+    <div class="bg-decoration">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">📚 Online Bookstore</div>
+        <form method="get" action="{% url 'search_books' %}" class="search-container">
+            <input type="text" class="search" name="q" placeholder="Search by title, author, or category" value="{{ query }}">
+            <button type="submit" class="search-btn">Search</button>
+        </form>
+        <div class="nav-buttons">
+            {% if user.is_authenticated %}
+                {% if not user.is_staff %}
+                    <a href="{% url 'profile' %}" class="btn-nav">👤 Profile</a>
+                    <a href="{% url 'order_history' %}" class="btn-nav">📦 Order History</a>
+                {% endif %}
+                <a href="{% url 'cart_view' %}" class="btn-nav">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+                <a href="{% url 'logout' %}" class="btn-nav">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-nav">Login</a>
+                <a href="{% url 'signup' %}" class="btn-nav">Sign Up</a>
+                <a href="{% url 'cart_view' %}" class="btn-nav">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+            {% endif %}
+        </div>
+    </div>
 
     <div class="container">
-        <h1>Search Results for "{{ query }}"</h1>
+        <div class="search-header">
+            <h1>Search Results</h1>
+            <div class="search-stats">
+                {% if results %}
+                    Found {{ results|length }} book{{ results|length|pluralize }} for "<span class="query-highlight">{{ query }}</span>"
+                {% else %}
+                    No results found for "<span class="query-highlight">{{ query }}</span>"
+                {% endif %}
+            </div>
+        </div>
 
         {% if results %}
             <div class="book-grid">
                 {% for book in results %}
                     <div class="book-card">
                         <img src="{{ book.cover_image|default:'https://cdn-icons-png.flaticon.com/512/29/29302.png' }}" alt="{{ book.title }}">
-                        <div class="book-title">{{ book.title }}</div>
-                        <div class="book-author">by {{ book.author }}</div>
-                        <div class="book-genre">{{ book.category }}</div>
-                        <a href="{% url 'book_detail' book.id %}" class="details-link">View Details</a>
-                        <button type="button" class="btn btn-primary add-to-cart-btn" data-book-id="{{ book.id }}">Add to Cart</button>
-
+                        <div class="book-info">
+                            <div class="book-title">
+                                <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a>
+                            </div>
+                            <div class="book-author">by {{ book.author }}</div>
+                            <div class="book-genre">{{ book.category }}</div>
+                            <div class="rating">
+                                {% if book.rating %}
+                                    {% with book.rating|floatformat:0|add:"0" as stars %}
+                                        <span class="rating-stars">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= stars %}
+                                                ★
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+                                        {% endfor %}
+                                        </span>
+                                        <span class="rating-number">({{ book.rating }})</span>
+                                    {% endwith %}
+                                {% else %}
+                                    <span class="no-rating">No rating</span>
+                                {% endif %}
+                            </div>
+                            <div class="book-actions">
+                                <a href="{% url 'book_detail' book.id %}" class="details-link">View Details</a>
+                                <button type="button" class="add-to-cart-btn" data-book-id="{{ book.id }}">Add to Cart</button>
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p class="no-results">No books found matching your search.</p>
+            <div class="no-results">
+                <div class="no-results-icon">📚</div>
+                <h3>No books found</h3>
+                <p>We couldn't find any books matching your search. Try searching with different keywords or browse our featured books instead.</p>
+            </div>
         {% endif %}
 
-        <a href="{% url 'store_home' %}" class="back-link">← Back to Home</a>
+        <a href="{% url 'store_home' %}" class="back-link">
+            ← Back to Home
+        </a>
     </div>
+
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const bookId = this.dataset.bookId;
-            fetch(`/store/cart/ajax-add/${bookId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // Update cart count if element exists
-                    const cartCount = document.getElementById('cart-count');
-                    if (cartCount) {
-                        cartCount.textContent = data.cart_count;
-                    }
-                    this.textContent = "Added!";
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add to cart functionality
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bookId = this.dataset.bookId;
+                    
+                    // Show loading state
+                    this.textContent = 'Adding...';
                     this.disabled = true;
+                    
+                    // AJAX call to add to cart
+                    fetch(`/store/cart/ajax-add/${bookId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update cart count
+                            const cartCount = document.getElementById('cart-count');
+                            if (cartCount) {
+                                cartCount.textContent = data.cart_count;
+                            }
+                            
+                            this.textContent = 'Added!';
+                            this.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                            
+                            setTimeout(() => {
+                                this.textContent = 'Add to Cart';
+                                this.disabled = false;
+                                this.style.background = 'linear-gradient(45deg, #DC143C, #FF6B6B)';
+                            }, 2000);
+                        } else {
+                            this.textContent = 'Error';
+                            this.style.background = 'linear-gradient(45deg, #dc3545, #c82333)';
+                            setTimeout(() => {
+                                this.textContent = 'Add to Cart';
+                                this.disabled = false;
+                                this.style.background = 'linear-gradient(45deg, #DC143C, #FF6B6B)';
+                            }, 2000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.textContent = 'Error';
+                        this.disabled = false;
+                        this.style.background = 'linear-gradient(45deg, #dc3545, #c82333)';
+                        setTimeout(() => {
+                            this.textContent = 'Add to Cart';
+                            this.style.background = 'linear-gradient(45deg, #DC143C, #FF6B6B)';
+                        }, 2000);
+                    });
+                });
+            });
+
+            // Search functionality
+            const searchForm = document.querySelector('.search-container');
+            const searchInput = document.querySelector('.search');
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchForm.submit();
                 }
             });
-        });
-    });
-});
-</script>
 
+            // Enhanced hover effects
+            document.querySelectorAll('.book-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Smooth scroll for back link
+            document.querySelector('.back-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 300);
+            });
+        });
+    </script>
 </body>
 </html>
