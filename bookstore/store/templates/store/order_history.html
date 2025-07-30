@@ -5,109 +5,281 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 40px auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 25px;
+            border: 2px solid rgba(220, 20, 60, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
             text-align: center;
-            color: #b22222;
-            margin-bottom: 30px;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-shadow: 0 0 30px rgba(220, 20, 60, 0.5);
         }
 
         .order-card {
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(220, 20, 60, 0.2);
+            border-radius: 20px;
             margin-bottom: 25px;
-            padding: 20px;
-            background-color: #fff;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(220, 20, 60, 0.02), transparent);
+            opacity: 0.5;
+        }
+
+        .order-card:hover {
+            border-color: rgba(220, 20, 60, 0.4);
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.1);
+            transform: translateY(-2px);
         }
 
         .order-header {
             font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 10px;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #FF6B6B;
+            position: relative;
+            z-index: 2;
         }
 
         .item-list {
             list-style: none;
             padding-left: 0;
-            margin: 10px 0 0 0;
+            margin: 15px 0 0 0;
+            position: relative;
+            z-index: 2;
         }
 
         .item-list li {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-size: 1em;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(220, 20, 60, 0.1);
+        }
+
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+
+        .item-details {
+            flex: 1;
         }
 
         .reorder-btn {
-            background-color: #b22222;
+            background: linear-gradient(45deg, #DC143C, #FF6B6B);
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 16px;
             font-size: 0.9em;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
-            margin-left: 10px;
-            transition: background-color 0.2s ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reorder-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .reorder-btn:hover:not(:disabled)::before {
+            left: 100%;
         }
 
         .reorder-btn:disabled {
-            background-color: #999;
+            background: rgba(128, 128, 128, 0.5);
             cursor: not-allowed;
+            transform: none;
         }
 
         .reorder-btn:hover:not(:disabled) {
-            background-color: #8a1c1c;
+            background: linear-gradient(45deg, #FF6B6B, #DC143C);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .reorder-btn.success {
+            background: linear-gradient(45deg, #22c55e, #16a34a);
         }
 
         .details-link {
             display: inline-block;
-            margin-top: 10px;
-            color: #0066cc;
+            margin-top: 15px;
+            color: #FF6B6B;
             text-decoration: none;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
         }
 
         .details-link:hover {
+            color: #DC143C;
             text-decoration: underline;
         }
 
         .nav-links {
             display: flex;
             justify-content: space-between;
-            margin-top: 30px;
+            margin-top: 40px;
+            gap: 20px;
         }
 
         .nav-links a {
-            background-color: #fff;
-            border: 2px solid #b22222;
-            color: #b22222;
-            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            color: white;
+            padding: 15px 25px;
             text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: all 0.2s ease;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            flex: 1;
+            text-align: center;
         }
 
         .nav-links a:hover {
-            background-color: #b22222;
+            background: rgba(220, 20, 60, 0.2);
+            border-color: rgba(220, 20, 60, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
+        }
+
+        .no-orders {
+            text-align: center;
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 2px dashed rgba(220, 20, 60, 0.3);
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.success {
+            background: rgba(34, 197, 94, 0.9);
             color: white;
+            border: 2px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .notification.error {
+            background: rgba(245, 158, 11, 0.9);
+            color: white;
+            border: 2px solid rgba(245, 158, 11, 0.5);
+        }
+
+        .notification.warning {
+            background: rgba(249, 115, 22, 0.9);
+            color: white;
+            border: 2px solid rgba(249, 115, 22, 0.5);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .stock-info {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+
+        .stock-info.low-stock {
+            color: #f59e0b;
+        }
+
+        .stock-info.out-of-stock {
+            color: #ef4444;
+        }
+
+        /* Loading state */
+        .reorder-btn.loading {
+            background: rgba(128, 128, 128, 0.5);
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 25px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+            }
+
+            .item-list li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .reorder-btn {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Your Order History</h1>
+    <h1>📦 Your Order History</h1>
 
     {% if orders %}
         {% for order in orders %}
@@ -118,47 +290,256 @@
                 <ul class="item-list">
                     {% for item in order.items.all %}
                         <li>
-                            {{ item.book.title }} x{{ item.quantity }} — ${{ item.price_each|floatformat:2 }}
-                            <button type="button" class="reorder-btn" data-book-id="{{ item.book.id }}">Reorder</button>
+                            <div class="item-details">
+                                <div>{{ item.book.title }} x{{ item.quantity }} — ${{ item.price_each|floatformat:2 }}</div>
+                                <div class="stock-info" data-book-id="{{ item.book.id }}">
+                                    Stock: {{ item.book.quantity_in_stock }} available
+                                </div>
+                            </div>
+                            <button type="button" 
+                                    class="reorder-btn" 
+                                    data-book-id="{{ item.book.id }}"
+                                    data-book-title="{{ item.book.title }}"
+                                    data-stock="{{ item.book.quantity_in_stock }}">
+                                Reorder
+                            </button>
                         </li>
                     {% endfor %}
                 </ul>
-                <a href="{% url 'order_confirmation' order.order_id %}" class="details-link">View Details</a>
+                <a href="{% url 'order_confirmation' order.order_id %}" class="details-link">View Full Details →</a>
             </div>
         {% endfor %}
     {% else %}
-        <p style="text-align:center; font-size: 1.1em;">You have no orders yet.</p>
+        <div class="no-orders">
+            <p>📚 You have no orders yet.</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">Start shopping to see your order history here!</p>
+        </div>
     {% endif %}
 
     <div class="nav-links">
-        <a href="{% url 'store_home' %}">← Back to Home</a>
+        <a href="{% url 'store_home' %}">🏠 Back to Home</a>
         <a href="{% url 'cart_view' %}">🛒 View Cart</a>
     </div>
 </div>
 
 <script>
+function showNotification(message, type = 'success') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(n => n.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Trigger show animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, 5000);
+}
+
+function updateStockDisplay(bookId, newStock) {
+    const stockInfo = document.querySelector(`[data-book-id="${bookId}"].stock-info`);
+    if (stockInfo) {
+        stockInfo.textContent = `Stock: ${newStock} available`;
+        stockInfo.className = 'stock-info';
+        
+        if (newStock <= 5 && newStock > 0) {
+            stockInfo.classList.add('low-stock');
+        } else if (newStock === 0) {
+            stockInfo.classList.add('out-of-stock');
+        }
+    }
+}
+
+function getCsrfToken() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'csrftoken') {
+            return value;
+        }
+    }
+    return '';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.reorder-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const bookId = this.dataset.bookId;
-            fetch(`/store/cart/ajax-add/${bookId}/`, {
-                method: 'POST',
+            const bookTitle = this.dataset.bookTitle;
+            const currentStock = parseInt(this.dataset.stock);
+            
+            // Check stock before attempting to add
+            if (currentStock <= 0) {
+                showNotification(`Sorry, "${bookTitle}" is currently out of stock.`, 'error');
+                return;
+            }
+            
+            // Set loading state
+            this.classList.add('loading');
+            this.textContent = 'Adding...';
+            this.disabled = true;
+            
+            // First, check current cart status for this book
+            fetch(`/store/cart/check-availability/${bookId}/`, {
+                method: 'GET',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (document.getElementById('cart-count')) {
-                        document.getElementById('cart-count').textContent = data.cart_count;
-                    }
-                    this.textContent = "Added!";
-                    this.disabled = true;
+            .then(checkData => {
+                if (!checkData.success) {
+                    throw new Error(checkData.message || 'Failed to check availability');
                 }
+                
+                const currentInCart = checkData.current_in_cart || 0;
+                const availableStock = checkData.available_stock || 0;
+                const canAdd = checkData.can_add_more || false;
+                
+                // Check if we can add more to cart
+                if (!canAdd) {
+                    this.classList.remove('loading');
+                    this.textContent = "Reorder";
+                    this.disabled = false;
+                    
+                    if (currentInCart > 0) {
+                        if (availableStock === 0) {
+                            showNotification(
+                                `"${bookTitle}" is out of stock. You have ${currentInCart} in your cart.`, 
+                                'error'
+                            );
+                        } else {
+                            showNotification(
+                                `You already have ${currentInCart} of "${bookTitle}" in your cart. Only ${availableStock} total available.`, 
+                                'warning'
+                            );
+                        }
+                    } else {
+                        showNotification(`"${bookTitle}" is currently out of stock.`, 'error');
+                    }
+                    return;
+                }
+                
+                // Proceed with adding to cart
+                return fetch(`/store/cart/ajax-add/${bookId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                });
+            })
+            .then(res => {
+                if (!res) return null; // No need to process if we didn't make the add request
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return; // No data to process
+                
+                this.classList.remove('loading');
+                
+                if (data.success) {
+                    // Update cart count if element exists
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = data.cart_count;
+                    }
+                    
+                    // Update button state
+                    this.textContent = "Added!";
+                    this.classList.add('success');
+                    
+                    // Update stock display if provided
+                    if (data.remaining_stock !== undefined) {
+                        updateStockDisplay(bookId, data.remaining_stock);
+                        this.dataset.stock = data.remaining_stock;
+                    }
+                    
+                    const newCartQuantity = data.new_cart_quantity || 1;
+                    showNotification(
+                        `"${bookTitle}" added to cart! You now have ${newCartQuantity} in your cart.`, 
+                        'success'
+                    );
+                    
+                    // Re-enable button after 3 seconds
+                    setTimeout(() => {
+                        this.textContent = "Reorder";
+                        this.classList.remove('success');
+                        this.disabled = false;
+                    }, 3000);
+                } else {
+                    // Handle specific error cases
+                    if (data.error === 'insufficient_stock') {
+                        const currentInCart = data.current_in_cart || 0;
+                        if (currentInCart > 0) {
+                            showNotification(
+                                `You have ${currentInCart} of "${bookTitle}" in cart. Only ${data.available_stock} total available.`, 
+                                'warning'
+                            );
+                        } else {
+                            showNotification(
+                                `Only ${data.available_stock} of "${bookTitle}" available.`, 
+                                'warning'
+                            );
+                        }
+                    } else if (data.error === 'out_of_stock') {
+                        showNotification(`"${bookTitle}" is now out of stock.`, 'error');
+                        updateStockDisplay(bookId, 0);
+                        this.dataset.stock = 0;
+                    } else if (data.error === 'already_at_max') {
+                        showNotification(
+                            `You already have all available stock of "${bookTitle}" in your cart.`, 
+                            'warning'
+                        );
+                    } else {
+                        showNotification(
+                            data.message || `Could not add "${bookTitle}" to cart. Please try again.`, 
+                            'error'
+                        );
+                    }
+                    
+                    // Re-enable button
+                    this.textContent = "Reorder";
+                    this.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.classList.remove('loading');
+                this.textContent = "Reorder";
+                this.disabled = false;
+                showNotification(`Network error. Please check your connection and try again.`, 'error');
             });
         });
+    });
+    
+    // Update stock info styling on page load
+    document.querySelectorAll('.stock-info').forEach(stockInfo => {
+        const stockText = stockInfo.textContent;
+        const stockMatch = stockText.match(/(\d+) available/);
+        if (stockMatch) {
+            const stock = parseInt(stockMatch[1]);
+            if (stock <= 5 && stock > 0) {
+                stockInfo.classList.add('low-stock');
+            } else if (stock === 0) {
+                stockInfo.classList.add('out-of-stock');
+            }
+        }
     });
 });
 </script>

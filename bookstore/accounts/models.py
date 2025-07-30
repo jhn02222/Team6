@@ -94,9 +94,24 @@ import hashlib
 class PaymentCard(models.Model):
     user = models.ForeignKey('Users', on_delete=models.CASCADE, related_name='cards')
     card_type = models.CharField(max_length=20)
+    name = models.CharField(
+        max_length=100,
+        help_text="Name on the card"
+    )
     card_number_hash = models.CharField(max_length=64)  # SHA-256 hash
     last4 = models.CharField(max_length=4)
-    expiration_date = models.CharField(max_length=5)
+    expiration_date = models.CharField(
+        max_length=5,
+        help_text="Expiration date in MM/YY format, e.g. 02/23"
+    )
+    cvv_hash = models.CharField(
+        max_length=64,
+        help_text="SHA-256 hash of the card CVV"
+    )
+    zipcode = models.CharField(
+        max_length=20,
+        help_text="Billing ZIP/postal code"
+    )
 
     def __str__(self):
         return f"{self.user.email} - {self.card_type} ending in {self.last4}"
@@ -107,3 +122,7 @@ class PaymentCard(models.Model):
     @staticmethod
     def hash_card_number(card_number: str) -> str:
         return hashlib.sha256(card_number.encode()).hexdigest()
+    
+    @staticmethod
+    def hash_cvv(cvv: str) -> str:
+        return hashlib.sha256(cvv.encode()).hexdigest()

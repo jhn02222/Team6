@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 8px 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background-color: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h2>Hi {{ name }},</h2>
+    <p>Thank you for your order! Below are your order details:</p>
+
+    <p><strong>Order ID:</strong> {{ order_id }}<br>
+    <strong>Order Date:</strong> {{ order_date }}<br>
+    <strong>Shipping Address:</strong><br>{{ shipping_address }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Qty</th>
+                <th>Price Each</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.title }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.price_each }}</td>
+                <td>${{ item.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+   <p><strong>Total Amount:</strong> ${{ total }}</p>
+    <p>We appreciate your business and hope you enjoy your purchase!</p>
+    <p>Best regards,<br>The Bookstore Team</p>
+</body>
+</html>

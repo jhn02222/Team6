@@ -412,7 +412,9 @@
         </div>
         <div class="summary-row">
           <span class="summary-label">Total:</span>
-          <span class="summary-value total-value">$<span id="final-total">{{ total|add:tax|floatformat:2 }}</span></span>
+           <span class="summary-value total-value">
+    $<span id="final-total">{{ total_after_tax|floatformat:2 }}</span>
+  </span>
         </div>
         
         <div class="actions">
@@ -446,6 +448,7 @@
   </div>
 
   <script>
+    const originalTotal = parseFloat("{{ total_after_tax|floatformat:2 }}");
     document.addEventListener('DOMContentLoaded', () => {
       // Check if cart is empty and reload if needed
       function checkCartEmpty() {

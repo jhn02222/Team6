@@ -4,21 +4,20 @@ from .models import Book
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = '__all__'
+        fields = [
+            'isbn', 'title', 'author', 'category', 'edition', 
+            'publisher', 'publication_year', 'cover_image',
+            'quantity_in_stock', 'minimum_threshold', 'buying_price',
+            'selling_price', 'is_featured', 'release_date', 'rating'
+        ]
         widgets = {
-            'isbn': forms.TextInput(attrs={'class': 'form-input'}),
-            'title': forms.TextInput(attrs={'class': 'form-input'}),
-            'author': forms.TextInput(attrs={'class': 'form-input'}),
-            'category': forms.TextInput(attrs={'class': 'form-input'}),
-            'edition': forms.TextInput(attrs={'class': 'form-input'}),
-            'publisher': forms.TextInput(attrs={'class': 'form-input'}),
-            'publication_year': forms.NumberInput(attrs={'class': 'form-input'}),
-            'cover_image': forms.URLInput(attrs={'class': 'form-input'}),
-            'quantity_in_stock': forms.NumberInput(attrs={'class': 'form-input'}),
-            'minimum_threshold': forms.NumberInput(attrs={'class': 'form-input'}),
-            'buying_price': forms.NumberInput(attrs={'class': 'form-input'}),
-            'selling_price': forms.NumberInput(attrs={'class': 'form-input'}),
-            'is_featured': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
-            'release_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'release_date': forms.DateInput(attrs={'type': 'date'}),
+            'rating': forms.NumberInput(attrs={'step': '0.01', 'min': '0', 'max': '5'}),
+            'publication_year': forms.NumberInput(attrs={'min': '1000', 'max': '2030'}),
         }
-       
+from .models import Promotion
+
+class PromotionForm(forms.ModelForm):
+    class Meta:
+        model = Promotion
+        fields = ['promo_code', 'percentage', 'start_date', 'expiration_date']

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Book - Admin Panel</title>
+    <title>Create Promotion - Admin Panel</title>
     <style>
         * {
             margin: 0;
@@ -131,7 +131,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="none"/><text x="50" y="50" text-anchor="middle" font-size="40" fill="rgba(220,20,60,0.03)">📚</text></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>');
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="promotions" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="none"/><text x="50" y="50" text-anchor="middle" font-size="40" fill="rgba(220,20,60,0.03)">📢</text></pattern></defs><rect width="100" height="100" fill="url(%23promotions)"/></svg>');
             animation: bgMove 25s linear infinite;
         }
 
@@ -166,7 +166,7 @@
         /* Form Section */
         .form-section {
             padding: 40px;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -196,56 +196,42 @@
             padding: 60px 50px;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 50px;
-            align-items: start;
-        }
-
-        /* Cover Image Section */
-        .cover-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
+        /* Promotion Icon Section */
+        .promotion-icon {
             text-align: center;
-            border: 1px solid rgba(220, 20, 60, 0.2);
-            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
         }
 
-        .cover-preview {
-            width: 100%;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            margin-bottom: 20px;
+        .icon-display {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, rgba(220, 20, 60, 0.2), rgba(255, 107, 107, 0.2));
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4em;
-            color: rgba(255, 255, 255, 0.3);
-            border: 2px dashed rgba(220, 20, 60, 0.3);
-            transition: all 0.3s ease;
+            font-size: 3em;
+            margin: 0 auto 20px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            backdrop-filter: blur(10px);
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .cover-preview:hover {
-            border-color: #DC143C;
-            background: rgba(220, 20, 60, 0.1);
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(220, 20, 60, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(220, 20, 60, 0.4); }
         }
 
-        /* Form Fields Section */
-        .fields-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        .icon-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1em;
+            font-weight: 500;
         }
 
+        /* Form Fields */
         .field-group {
-            margin-bottom: 25px;
-        }
-
-        .field-group.full-width {
-            grid-column: 1 / -1;
+            margin-bottom: 30px;
+            position: relative;
         }
 
         label {
@@ -260,7 +246,7 @@
 
         input, select, textarea {
             width: 100%;
-            padding: 15px 20px;
+            padding: 18px 25px;
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(220, 20, 60, 0.2);
             border-radius: 15px;
@@ -268,6 +254,12 @@
             font-size: 1em;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
         }
 
         input:focus, select:focus, textarea:focus {
@@ -275,25 +267,47 @@
             border-color: #DC143C;
             background: rgba(220, 20, 60, 0.1);
             box-shadow: 0 0 20px rgba(220, 20, 60, 0.2);
+            transform: translateY(-2px);
         }
 
-        input::placeholder {
+        input::placeholder, textarea::placeholder {
             color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Select styling */
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
         }
 
         /* Checkbox styling */
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 15px 0;
+            gap: 15px;
+            padding: 20px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(220, 20, 60, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-group:hover {
+            border-color: rgba(220, 20, 60, 0.4);
+            background: rgba(220, 20, 60, 0.05);
         }
 
         input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             accent-color: #DC143C;
             cursor: pointer;
+            margin: 0;
         }
 
         .checkbox-group label {
@@ -301,18 +315,18 @@
             cursor: pointer;
             text-transform: none;
             letter-spacing: normal;
+            font-size: 1em;
         }
 
-        /* Save Button */
-        .save-button {
-            grid-column: 1 / -1;
-            justify-self: center;
-            padding: 18px 50px;
+        /* Send Button */
+        .send-button {
+            width: 100%;
+            padding: 20px 50px;
             background: linear-gradient(45deg, #DC143C, #FF6B6B);
             color: white;
             border: none;
             border-radius: 25px;
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -323,7 +337,7 @@
             overflow: hidden;
         }
 
-        .save-button::before {
+        .send-button::before {
             content: '';
             position: absolute;
             top: 0;
@@ -334,27 +348,20 @@
             transition: left 0.5s ease;
         }
 
-        .save-button:hover::before {
+        .send-button:hover::before {
             left: 100%;
         }
 
-        .save-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 25px rgba(220, 20, 60, 0.4);
+        .send-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(220, 20, 60, 0.4);
+        }
+
+        .send-button:active {
+            transform: translateY(-1px) scale(0.98);
         }
 
         /* Responsive design */
-        @media (max-width: 1024px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .fields-section {
-                grid-template-columns: 1fr;
-            }
-        }
-
         @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
@@ -378,6 +385,12 @@
             .form-section {
                 padding: 20px;
             }
+
+            .icon-display {
+                width: 80px;
+                height: 80px;
+                font-size: 2em;
+            }
         }
 
         /* Animation for form elements */
@@ -397,19 +410,40 @@
         }
 
         .field-group:nth-child(1) { animation-delay: 0.1s; }
-        .field-group:nth-child(2) { animation-delay: 0.15s; }
-        .field-group:nth-child(3) { animation-delay: 0.2s; }
-        .field-group:nth-child(4) { animation-delay: 0.25s; }
-        .field-group:nth-child(5) { animation-delay: 0.3s; }
-        .field-group:nth-child(6) { animation-delay: 0.35s; }
-        .field-group:nth-child(7) { animation-delay: 0.4s; }
-        .field-group:nth-child(8) { animation-delay: 0.45s; }
-        .field-group:nth-child(9) { animation-delay: 0.5s; }
-        .field-group:nth-child(10) { animation-delay: 0.55s; }
-        .field-group:nth-child(11) { animation-delay: 0.6s; }
-        .field-group:nth-child(12) { animation-delay: 0.65s; }
-        .field-group:nth-child(13) { animation-delay: 0.7s; }
-        .field-group:nth-child(14) { animation-delay: 0.75s; }
+        .field-group:nth-child(2) { animation-delay: 0.2s; }
+        .field-group:nth-child(3) { animation-delay: 0.3s; }
+        .field-group:nth-child(4) { animation-delay: 0.4s; }
+        .field-group:nth-child(5) { animation-delay: 0.5s; }
+        .field-group:nth-child(6) { animation-delay: 0.6s; }
+        .field-group:nth-child(7) { animation-delay: 0.7s; }
+
+        .promotion-icon {
+            animation: slideInUp 0.6s ease forwards;
+            animation-delay: 0.05s;
+        }
+
+        /* Success message styling */
+        .success-message {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -432,8 +466,8 @@
     <!-- Header Section -->
     <div class="header-section">
         <div class="header-content">
-            <h1>📚 Add New Book</h1>
-            <p>Expand your bookstore inventory by adding new titles with comprehensive details and pricing information.</p>
+            <h1>📢 Create Promotion</h1>
+            <p>Engage your customers with compelling promotional campaigns and special offers to boost sales and visibility.</p>
         </div>
     </div>
 
@@ -441,120 +475,60 @@
     <div class="form-section">
         <div class="form-container">
             <div class="form-content">
-                <form method="POST" enctype="multipart/form-data">
+                <!-- Promotion Icon -->
+                <div class="promotion-icon">
+                    <div class="icon-display">📢</div>
+                    <div class="icon-subtitle">Promotional Campaign</div>
+                </div>
+
+                <form method="post">
                     {% csrf_token %}
-                    <div class="form-grid">
-                        <!-- Cover Image Section -->
-                        <div class="cover-section">
-                            <div class="cover-preview">
-                                📷
-                            </div>
-                            <div class="field-group">
-                                <label for="{{ form.cover_image.id_for_label }}">Cover Image URL</label>
-                                {{ form.cover_image }}
-                            </div>
-                        </div>
+                    
+                    <!-- Success/Error Messages -->
+                    <div class="success-message" id="successMessage">
+                        ✅ Promotion created successfully!
+                    </div>
+                    <div class="error-message" id="errorMessage">
+                        ❌ Please check the form for errors.
+                    </div>
 
-                        <!-- Form Fields Section -->
-                        <div class="fields-section">
-                            <div class="field-group">
-                                <label for="{{ form.isbn.id_for_label }}">ISBN *</label>
-                                {{ form.isbn }}
-                            </div>
+                    <!-- Promotion form fields based on Django model -->
+                    <div class="field-group">
+                        <label for="{{ form.promo_code.id_for_label }}">Promo Code *</label>
+                        {{ form.promo_code }}
+                    </div>
 
-                            <div class="field-group">
-                                <label for="{{ form.title.id_for_label }}">Book Title *</label>
-                                {{ form.title }}
-                            </div>
+                    <div class="field-group">
+                        <label for="{{ form.percentage.id_for_label }}">Discount Percentage *</label>
+                        {{ form.percentage }}
+                    </div>
 
-                            <div class="field-group">
-                                <label for="{{ form.author.id_for_label }}">Author *</label>
-                                {{ form.author }}
-                            </div>
+                    <div class="field-group">
+                        <label for="{{ form.start_date.id_for_label }}">Start Date *</label>
+                        {{ form.start_date }}
+                    </div>
 
-                            <div class="field-group">
-                                <label for="{{ form.category.id_for_label }}">Category *</label>
-                                {{ form.category }}
-                            </div>
+                    <div class="field-group">
+                        <label for="{{ form.expiration_date.id_for_label }}">Expiration Date *</label>
+                        {{ form.expiration_date }}
+                    </div>
 
-                            <div class="field-group">
-                                <label for="{{ form.edition.id_for_label }}">Edition</label>
-                                {{ form.edition }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.publisher.id_for_label }}">Publisher</label>
-                                {{ form.publisher }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.publication_year.id_for_label }}">Publication Year</label>
-                                {{ form.publication_year }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.release_date.id_for_label }}">Release Date</label>
-                                {{ form.release_date }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.quantity_in_stock.id_for_label }}">Quantity in Stock *</label>
-                                {{ form.quantity_in_stock }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.minimum_threshold.id_for_label }}">Minimum Threshold *</label>
-                                {{ form.minimum_threshold }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.buying_price.id_for_label }}">Buying Price *</label>
-                                {{ form.buying_price }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.selling_price.id_for_label }}">Selling Price *</label>
-                                {{ form.selling_price }}
-                            </div>
-
-                            <div class="field-group">
-                                <label for="{{ form.rating.id_for_label }}">Rating (0.00 - 5.00)</label>
-                                {{ form.rating }}
-                            </div>
-
-                            <div class="field-group">
-                                <div class="checkbox-group">
-                                    {{ form.is_featured }}
-                                    <label for="{{ form.is_featured.id_for_label }}">Featured Book</label>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="save-button">
-                                💾 Save Book
-                            </button>
+                    <div class="field-group">
+                        <div class="checkbox-group">
+                            {{ form.is_active }}
+                            <label for="{{ form.is_active.id_for_label }}">Active Promotion</label>
                         </div>
                     </div>
+
+                    <button type="submit" class="send-button">
+                        🚀 Send Promotion
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
-        // Cover image preview functionality
-        const coverImageInput = document.querySelector('input[type="url"]');
-        const coverPreview = document.querySelector('.cover-preview');
-
-        if (coverImageInput) {
-            coverImageInput.addEventListener('input', function() {
-                const url = this.value;
-                if (url) {
-                    coverPreview.innerHTML = `<img src="${url}" alt="Cover Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" onerror="this.parentElement.innerHTML='📷'">`;
-                } else {
-                    coverPreview.innerHTML = '📷';
-                }
-            });
-        }
-
         // Form validation and enhancement
         const form = document.querySelector('form');
         const inputs = document.querySelectorAll('input, select, textarea');
@@ -579,10 +553,48 @@
 
         // Form submission enhancement
         form.addEventListener('submit', function(e) {
-            const saveButton = document.querySelector('.save-button');
-            saveButton.innerHTML = '⏳ Saving...';
-            saveButton.disabled = true;
+            const sendButton = document.querySelector('.send-button');
+            const originalText = sendButton.innerHTML;
+            
+            sendButton.innerHTML = '⏳ Sending Promotion...';
+            sendButton.disabled = true;
+            
+            // Re-enable button after 3 seconds (for demo purposes)
+            setTimeout(() => {
+                sendButton.innerHTML = originalText;
+                sendButton.disabled = false;
+            }, 3000);
         });
+
+        // Date validation for promotion dates
+        const startDateInput = document.querySelector('input[type="date"]');
+        const endDateInput = document.querySelectorAll('input[type="date"]')[1];
+
+        if (startDateInput && endDateInput) {
+            startDateInput.addEventListener('change', function() {
+                endDateInput.min = this.value;
+            });
+
+            endDateInput.addEventListener('change', function() {
+                if (this.value < startDateInput.value) {
+                    alert('Expiration date cannot be before start date');
+                    this.value = '';
+                }
+            });
+        }
+
+        // Percentage validation (0-100)
+        const percentageInput = document.querySelector('input[type="number"]');
+        if (percentageInput) {
+            percentageInput.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (value < 0) {
+                    this.value = 0;
+                } else if (value > 100) {
+                    this.value = 100;
+                }
+            });
+        }
 
         // Add intersection observer for scroll animations
         const observerOptions = {
@@ -600,12 +612,51 @@
         }, observerOptions);
 
         // Observe form elements
-        document.querySelectorAll('.field-group').forEach(field => {
+        document.querySelectorAll('.field-group, .promotion-icon').forEach(field => {
             field.style.opacity = '0';
             field.style.transform = 'translateY(30px)';
             field.style.transition = 'all 0.6s ease';
             observer.observe(field);
         });
+
+        // Remove promotion type handling since it's not in the model
+        // Promo code generation helper
+        const promoCodeInput = document.querySelector('input[name*="promo_code"]');
+        if (promoCodeInput) {
+            // Add button to generate random promo code
+            const generateBtn = document.createElement('button');
+            generateBtn.type = 'button';
+            generateBtn.innerHTML = '🎲 Generate Code';
+            generateBtn.style.cssText = `
+                margin-top: 10px;
+                padding: 8px 15px;
+                background: rgba(220, 20, 60, 0.2);
+                color: white;
+                border: 1px solid rgba(220, 20, 60, 0.3);
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 0.9em;
+                transition: all 0.3s ease;
+            `;
+            
+            generateBtn.addEventListener('click', function() {
+                const randomCode = 'PROMO' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                promoCodeInput.value = randomCode;
+                promoCodeInput.dispatchEvent(new Event('input'));
+            });
+            
+            generateBtn.addEventListener('mouseenter', function() {
+                this.style.background = 'rgba(220, 20, 60, 0.3)';
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            generateBtn.addEventListener('mouseleave', function() {
+                this.style.background = 'rgba(220, 20, 60, 0.2)';
+                this.style.transform = 'translateY(0)';
+            });
+            
+            promoCodeInput.parentElement.appendChild(generateBtn);
+        }
     </script>
 </body>
 </html>

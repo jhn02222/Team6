@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.crypto import get_random_string
-
+import uuid
 class Book(models.Model):
     isbn = models.CharField(max_length=13, unique=True)
     title = models.CharField(max_length=255)
@@ -70,3 +70,39 @@ class OrderItem(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price_each = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class Promotion(models.Model):
+    promo_code = models.CharField(max_length=20, unique=True)
+    percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    start_date = models.DateField()
+    expiration_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)  # for optional deactivation
+
+    def __str__(self):
+        return f"{self.promo_code} ({self.percentage}% off)"
+
+    class Meta:
+        ordering = ['-created_at']
+        constraints = [
+            models.CheckConstraint(check=models.Q(percentage__gt=0, percentage__lte=100), name='valid_percentage_range')
+        ]
+
+
+class PromotionSent(models.Model):
+    promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('promotion', 'user')
+
+
+class PromotionUsage(models.Model):
+    promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    used_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('promotion', 'user')

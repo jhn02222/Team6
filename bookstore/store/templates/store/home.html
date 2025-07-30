@@ -28,6 +28,7 @@
                 {% if not user.is_staff %}
                     <a href="{% url 'profile' %}" class="btn-nav">👤 Profile</a>
                     <a href="{% url 'order_history' %}" class="btn-nav">📦 Order History</a>
+                    <a href="{% url 'view_promotions' %}" class="btn-nav">🎁 Promotions</a>
                 {% endif %}
                 <a href="{% url 'cart_view' %}" class="btn-nav">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
                 <a href="{% url 'logout' %}" class="btn-nav">Logout</a>

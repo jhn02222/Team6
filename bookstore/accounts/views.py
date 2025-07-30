@@ -170,6 +170,8 @@ def verify_email(request, token):
 
 @require_http_methods(["GET", "POST"])
 @never_cache
+@require_http_methods(["GET", "POST"])
+@never_cache
 def login_view(request):
     """Handle user login with optional 'remember me'."""
     if request.user.is_authenticated:
@@ -185,32 +187,27 @@ def login_view(request):
             user = _find_user_by_identifier(identifier)
             
             if not user:
-                messages.error(request, 'No user found with that email or account ID.')
+                messages.error(request, 'No user found with that email or account ID.', extra_tags='login')
             elif not user.check_password(password):
-                messages.error(request, 'Incorrect password.')
+                messages.error(request, 'Incorrect password.', extra_tags='login')
             elif user.status == "Suspended":
-                messages.error(request, 'Your account has been suspended.')
+                messages.error(request, 'Your account has been suspended.', extra_tags='login')
             elif user.status == "Inactive":
                 _send_verification_email(request, user)
-                messages.warning(request, 'Please verify your email; we sent you another link.')
+                messages.warning(request, 'Please verify your email; we sent you another link.', extra_tags='login')
             else:
-                # Log in the user
                 login(request, user)
 
-                # Set session expiry based on remember_me
                 if remember_me:
-                    # Keep logged in for 2 weeks (or whatever SESSION_COOKIE_AGE is set to)
                     request.session.set_expiry(settings.SESSION_COOKIE_AGE)
                     request.session['remember_me'] = True
                 else:
-                    # Expire when browser closes
                     request.session.set_expiry(0)
                     request.session['remember_me'] = False
 
                 merge_session_cart(request, user)
                 logger.info(f"User {user.email} logged in successfully (remember_me: {remember_me})")
                 
-                # Redirect
                 next_url = request.GET.get('next')
                 if next_url:
                     return redirect(next_url)
@@ -265,6 +262,7 @@ def logout_view(request):
 # ------------------------------
 # PROFILE
 # ------------------------------
+
 @custom_login_required
 @require_http_methods(["GET", "POST"])
 def profile_view(request):
@@ -272,17 +270,36 @@ def profile_view(request):
     user = request.user
     address_instance = getattr(user, 'address', None)
     card_qs = user.cards.all()
-
     updates = []
 
     if request.method == 'POST':
         profile_form = EditProfileForm(request.POST, instance=user)
         password_form = CustomPasswordChangeForm(user, request.POST)
         address_form = AddressForm(request.POST, instance=address_instance)
-        card_forms = [
-            PaymentCardForm(request.POST, prefix=str(i), instance=card_qs[i] if i < len(card_qs) else None)
-            for i in range(4)
-        ]
+
+        card_forms = []
+        cards_valid = True
+        for i in range(4):
+            instance = card_qs[i] if i < len(card_qs) else None
+            form = PaymentCardForm(request.POST, prefix=str(i), instance=instance)
+            
+            # Check if this card form has any data (indicates it's active/visible)
+            card_has_data = any([
+                request.POST.get(f"{form.prefix}-card_number", "").strip(),
+                request.POST.get(f"{form.prefix}-card_type", "").strip(),
+                request.POST.get(f"{form.prefix}-name", "").strip(),
+                request.POST.get(f"{form.prefix}-expiration_date", "").strip(),
+                request.POST.get(f"{form.prefix}-cvv", "").strip(),
+                request.POST.get(f"{form.prefix}-zipcode", "").strip()
+            ])
+            
+            # Only validate forms that have data OR have an existing instance
+            if card_has_data or instance:
+                if not form.is_valid():
+                    cards_valid = False
+                    logger.warning(f"Card form {i} validation failed: {form.errors}")
+            
+            card_forms.append(form)
 
         password_change_requested = any([
             request.POST.get('old_password'),
@@ -292,33 +309,29 @@ def profile_view(request):
 
         profile_valid = profile_form.is_valid()
         address_valid = address_form.is_valid()
-        cards_valid = all(cf.is_valid() or not cf.has_changed() for cf in card_forms)
         password_valid = password_form.is_valid() if password_change_requested else True
 
         if profile_valid and address_valid and cards_valid and password_valid:
             try:
                 with transaction.atomic():
-                    # Detect changes
+                    # Track profile changes
                     if profile_form.has_changed():
                         updates.append("profile details")
+                        profile_form.save()
+
+                    # Track address changes
                     if address_form.has_changed():
                         updates.append("address")
                         address = address_form.save(commit=False)
                         address.user = user
                         address.save()
 
-                    profile_form.save()
-
-                    address = address_form.save(commit=False)
-                    address.user = user
-                    address.save()
-
-                    # Handle cards
-                    card_changes = _handle_payment_cards(user, card_forms, card_qs)
+                    # Track card changes - only process forms with data
+                    card_changes = _handle_payment_cards_updated(user, card_forms, card_qs, request.POST)
                     if card_changes:
                         updates.append("payment method(s)")
 
-                    # Handle password
+                    # Track password changes
                     if password_change_requested and password_valid:
                         updated_user = password_form.save()
                         update_session_auth_hash(request, updated_user)
@@ -327,7 +340,7 @@ def profile_view(request):
                     messages.success(request, 'Profile updated successfully!')
                     logger.info(f"User {user.email} updated profile")
 
-                    # Send notification if anything changed
+                    # Send confirmation email
                     if updates:
                         update_list = ", ".join(updates)
                         email_subject = "Confirmation: Your Bookstore Account Was Updated"
@@ -359,6 +372,17 @@ def profile_view(request):
                 messages.error(request, 'Password change failed. Please check your entries.')
             else:
                 messages.error(request, 'Please correct the errors in the form.')
+                
+            # Log specific validation errors for debugging
+            if not profile_valid:
+                logger.warning(f"Profile form errors: {profile_form.errors}")
+            if not address_valid:
+                logger.warning(f"Address form errors: {address_form.errors}")
+            if not cards_valid:
+                for i, cf in enumerate(card_forms):
+                    if cf.errors:
+                        logger.warning(f"Card form {i} errors: {cf.errors}")
+
     else:
         profile_form = EditProfileForm(instance=user)
         password_form = CustomPasswordChangeForm(user)
@@ -377,29 +401,51 @@ def profile_view(request):
     })
 
 
-def _handle_payment_cards(user, card_forms, existing_cards):
-    """Handle creation, update, deletion of payment cards"""
+def _handle_payment_cards_updated(user, card_forms, existing_cards, post_data):
+    """Handle creation, update, deletion of payment cards - improved version"""
     changed = False
     existing_cards_list = list(existing_cards)
 
     for i, cf in enumerate(card_forms):
-        if not cf.has_changed():
-            continue  # Skip unmodified forms to avoid accidental deletion
-
-        card_number = cf.cleaned_data.get('card_number')
-        if card_number:
-            card = cf.save(commit=False)
-            card.user = user
-            card.save()
-            changed = True
-        elif i < len(existing_cards_list):
-            existing_cards_list[i].delete()
-            logger.info(f"Deleted payment card for {user.email}")
-            changed = True
+        # Check if this is an existing card
+        is_existing_card = cf.instance and cf.instance.pk
+        
+        if is_existing_card:
+            # For existing cards, check if the form is valid first
+            if cf.is_valid():
+                # For existing cards, we need to check if the form has_changed()
+                # This is the proper Django way to detect if form data has changed
+                if cf.has_changed():
+                    print(f"DEBUG: Card form {i} has changes: {cf.changed_data}")
+                    cf.save()  # The form's save method will handle the logic
+                    changed = True
+                    logger.info(f"Updated existing payment card for {user.email}")
+                else:
+                    print(f"DEBUG: Card form {i} has no changes")
+        else:
+            # For new cards, check if form has any data
+            card_has_data = any([
+                post_data.get(f"{cf.prefix}-card_number", "").strip(),
+                post_data.get(f"{cf.prefix}-card_type", "").strip(),
+                post_data.get(f"{cf.prefix}-name", "").strip(),
+                post_data.get(f"{cf.prefix}-expiration_date", "").strip(),
+                post_data.get(f"{cf.prefix}-cvv", "").strip(),
+                post_data.get(f"{cf.prefix}-zipcode", "").strip()
+            ])
+            
+            # Skip forms without data that don't have existing instances
+            if not card_has_data:
+                continue
+                
+            if cf.is_valid():
+                # Save new card
+                card = cf.save(commit=False)
+                card.user = user
+                card.save()
+                changed = True
+                logger.info(f"Added new payment card for {user.email}")
 
     return changed
-
-
 # ------------------------------
 # STAFF ADMIN DASHBOARD
 # ------------------------------

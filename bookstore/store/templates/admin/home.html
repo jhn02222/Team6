@@ -399,13 +399,13 @@
                 <div class="card-description">Add new books to your inventory, manage existing titles, and update book information</div>
             </a>
 
-            <a href="{% url 'manage_users' %}" class="admin-card">
-                <div class="card-icon">👥</div>
-                <div class="card-title">Manage Users</div>
-                <div class="card-description">View and manage user accounts, permissions, and customer information</div>
-            </a>
+            <a href="{% url 'view_promos' %}" class="admin-card">
+    <div class="card-icon">📢</div>
+    <div class="card-title">View Promotions</div>
+    <div class="card-description">See all created promotions and which users received them</div>
+</a>
 
-            <a href="{% url 'manage_promotions' %}" class="admin-card">
+           <a href="/store/admin/promotions/create/" class="admin-card">
                 <div class="card-icon">🎯</div>
                 <div class="card-title">Manage Promotions</div>
                 <div class="card-description">Create and manage promotional campaigns, discounts, and special offers</div>

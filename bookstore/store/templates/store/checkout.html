@@ -1,120 +1,1209 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Checkout</title>
-    <style>
-
-        body {
-            background-color: #B02929;
-            margin: 0;
-            padding: 0;
-        }
-
-        .bookstore {
-            background-color: black;
-            color: white;
-            margin: 0;
-            padding: 10px;
-        }
-
-        .header {
-            background-color: white;
-            margin: 0;
-            padding: 10px;
-            margin-bottom: 80px;
-        }
-        .body-checkout {
-            background-color: white;
-            grid-template-columns: 1fr 1fr;
-            display: grid;
-            margin: 20px;
-            border: 2px solid black;
-            border-radius: 10px;
-        }
-
-        .left-side {
-            margin: 10px;
-        }
-        .right-side {
-            margin: 10px;
-        }
-
-        button {
-            background-color: #B02929;
-            color:white;
-            font-weight: bold;
-            height: 30px;
-            border-radius: 3px;
-        }
-
-        .text-box {
-            height: 26px;
-            border-radius: 3px;
-        }
-        .submit-button {
-            background-color: #B02929;
-            color:white;
-            font-weight: bold;
-            height: 30px;
-            border-radius: 3px;
-        }
-
-        .submit-button:hover {
-            cursor: pointer;
-        }
-
-        .back-home {
-            background-color: #ffffff; 
-            color: rgb(0, 0, 0); 
-            border-color: black;
-            padding: 10px; 
-            cursor: pointer; 
-            border-radius: 4px;
-            border: 2px solid black;
-            text-decoration: none; 
-            display: inline-block;
-            margin-left: 20px;
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - Online Bookstore</title>
+ {% load static %}
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ }
+body {
+background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+color: #ffffff;
+overflow-x: hidden;
+min-height: 100vh;
+ }
+/* Animated background elements */
+.bg-decoration {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: -1;
+ }
+.floating-shape {
+position: absolute;
+background: linear-gradient(45deg, rgba(220, 20, 60, 0.1), rgba(139, 0, 0, 0.1));
+border-radius: 50%;
+animation: float 6s ease-in-out infinite;
+ }
+.floating-shape:nth-child(1) {
+width: 80px;
+height: 80px;
+top: 15%;
+left: 8%;
+animation-delay: 0s;
+ }
+.floating-shape:nth-child(2) {
+width: 120px;
+height: 120px;
+top: 60%;
+right: 15%;
+animation-delay: 2s;
+ }
+.floating-shape:nth-child(3) {
+width: 60px;
+height: 60px;
+bottom: 25%;
+left: 25%;
+animation-delay: 4s;
+ }
+@keyframes float {
+ 0%, 100% { transform: translateY(0px) rotate(0deg); }
+ 50% { transform: translateY(-20px) rotate(180deg); }
+ }
+/* Navbar */
+.navbar {
+background: rgba(15, 15, 15, 0.95);
+backdrop-filter: blur(20px);
+padding: 20px 40px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: sticky;
+top: 0;
+z-index: 1000;
+border-bottom: 1px solid rgba(220, 20, 60, 0.3);
+ }
+.logo {
+font-size: 1.8em;
+font-weight: 800;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-shadow: 0 0 30px rgba(220, 20, 60, 0.5);
+ }
+.search-container {
+display: flex;
+flex: 1;
+max-width: 500px;
+margin: 0 40px;
+position: relative;
+ }
+.search {
+flex: 1;
+padding: 15px 25px;
+background: rgba(255, 255, 255, 0.1);
+border: 2px solid rgba(220, 20, 60, 0.3);
+border-right: none;
+border-radius: 25px 0 0 25px;
+color: #ffffff;
+font-size: 1em;
+backdrop-filter: blur(10px);
+transition: all 0.3s ease;
+ }
+.search:focus {
+outline: none;
+border-color: #DC143C;
+background: rgba(220, 20, 60, 0.1);
+box-shadow: 0 0 20px rgba(220, 20, 60, 0.2);
+ }
+.search::placeholder {
+color: rgba(255, 255, 255, 0.5);
+ }
+.search-btn {
+padding: 15px 25px;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+color: white;
+border: none;
+border-radius: 0 25px 25px 0;
+cursor: pointer;
+font-weight: 600;
+transition: all 0.3s ease;
+ }
+.search-btn:hover {
+background: linear-gradient(45deg, #FF6B6B, #DC143C);
+transform: translateY(-2px);
+box-shadow: 0 5px 15px rgba(220, 20, 60, 0.3);
+ }
+.nav-buttons {
+display: flex;
+gap: 15px;
+align-items: center;
+ }
+.btn-nav {
+padding: 12px 20px;
+background: rgba(255, 255, 255, 0.1);
+color: white;
+border: 1px solid rgba(220, 20, 60, 0.3);
+border-radius: 25px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+text-decoration: none;
+display: inline-block;
+position: relative;
+ }
+.btn-nav:hover {
+background: rgba(220, 20, 60, 0.2);
+transform: translateY(-2px);
+box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
+ }
+#cart-count {
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+color: white;
+border-radius: 50%;
+padding: 4px 8px;
+font-size: 0.8em;
+margin-left: 5px;
+min-width: 20px;
+text-align: center;
+ }
+/* Header Section */
+.header-section {
+padding: 80px 40px 60px;
+text-align: center;
+position: relative;
+overflow: hidden;
+ }
+.header-section::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="checkout" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="none"/><text x="50" y="50" text-anchor="middle" font-size="40" fill="rgba(220,20,60,0.03)">🛒</text></pattern></defs><rect width="100" height="100" fill="url(%23checkout)"/></svg>');
+animation: bgMove 25s linear infinite;
+ }
+@keyframes bgMove {
+ 0% { transform: translateX(0); }
+ 100% { transform: translateX(-100px); }
+ }
+.header-content {
+position: relative;
+z-index: 2;
+ }
+.header-content h1 {
+font-size: 3.5em;
+font-weight: 900;
+margin-bottom: 20px;
+background: linear-gradient(45deg, #DC143C, #FF6B6B, #FFB347);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-shadow: 0 0 40px rgba(220, 20, 60, 0.3);
+ }
+.header-content p {
+font-size: 1.2em;
+color: rgba(255, 255, 255, 0.8);
+max-width: 600px;
+margin: 0 auto 30px;
+ }
+/* Back to Home Button */
+.back-to-home {
+padding: 12px 25px;
+background: rgba(255, 255, 255, 0.1);
+color: white;
+border: 2px solid rgba(220, 20, 60, 0.3);
+border-radius: 25px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 8px;
+margin-top: 20px;
+position: relative;
+overflow: hidden;
+ }
+.back-to-home::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+transition: left 0.5s ease;
+ }
+.back-to-home:hover {
+background: rgba(220, 20, 60, 0.2);
+border-color: rgba(220, 20, 60, 0.5);
+transform: translateY(-2px);
+box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
+ }
+.back-to-home:hover::before {
+left: 100%;
+ }
+/* Container */
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 40px 60px;
+ }
+/* Checkout Form */
+.checkout-form {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 40px;
+margin-top: 40px;
+ }
+.checkout-section {
+background: rgba(255, 255, 255, 0.05);
+border-radius: 25px;
+padding: 40px;
+border: 2px solid rgba(220, 20, 60, 0.2);
+backdrop-filter: blur(15px);
+position: relative;
+overflow: hidden;
+transition: all 0.3s ease;
+ }
+.checkout-section::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: linear-gradient(45deg, transparent, rgba(220, 20, 60, 0.02), transparent);
+opacity: 0.5;
+ }
+.checkout-section:hover {
+border-color: rgba(220, 20, 60, 0.4);
+box-shadow: 0 10px 30px rgba(220, 20, 60, 0.1);
+ }
+.section-content {
+position: relative;
+z-index: 2;
+ }
+.section-title {
+font-size: 1.8em;
+font-weight: 700;
+margin-bottom: 30px;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+display: flex;
+align-items: center;
+gap: 12px;
+ }
+.subsection-title {
+font-size: 1.3em;
+font-weight: 600;
+margin: 30px 0 20px;
+color: rgba(255, 255, 255, 0.9);
+display: flex;
+align-items: center;
+gap: 10px;
+ }
+/* Form Inputs */
+.form-group {
+margin-bottom: 20px;
+ }
+.form-row {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 15px;
+margin-bottom: 15px;
+ }
+.text-box {
+width: 100%;
+padding: 15px 20px;
+background: rgba(255, 255, 255, 0.1);
+border: 2px solid rgba(220, 20, 60, 0.3);
+border-radius: 15px;
+color: #ffffff;
+font-size: 1em;
+backdrop-filter: blur(10px);
+transition: all 0.3s ease;
+ }
+.text-box:focus {
+outline: none;
+border-color: #DC143C;
+background: rgba(220, 20, 60, 0.1);
+box-shadow: 0 0 20px rgba(220, 20, 60, 0.2);
+ }
+.text-box::placeholder {
+color: rgba(255, 255, 255, 0.5);
+ }
+.text-box.error {
+border-color: #f59e0b;
+background: rgba(245, 158, 11, 0.1);
+animation: glow 0.6s ease-in-out;
+ }
+@keyframes glow {
+ 0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.3); }
+ 50% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.6); }
+ }
+.error-message {
+color: #f59e0b;
+font-size: 0.85em;
+margin-top: 5px;
+font-weight: 500;
+ }
+/* Promo Section */
+.promo-section {
+background: rgba(34, 197, 94, 0.05);
+border: 2px solid rgba(34, 197, 94, 0.3);
+border-radius: 20px;
+padding: 25px;
+margin-top: 20px;
+ }
+.promo-input-group {
+display: flex;
+gap: 10px;
+align-items: stretch;
+ }
+.promo-input {
+flex: 1;
+ }
+.promo-applied {
+background: rgba(34, 197, 94, 0.1);
+border: 2px solid rgba(34, 197, 94, 0.4);
+color: #22c55e;
+padding: 15px 20px;
+border-radius: 15px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+font-weight: 600;
+ }
+.promo-message {
+margin-top: 10px;
+font-size: 0.9em;
+font-weight: 600;
+ }
+.promo-message.success {
+color: #22c55e;
+ }
+.promo-message.error {
+color: #f59e0b;
+ }
+/* Buttons */
+.btn-primary {
+padding: 15px 30px;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+color: white;
+border: none;
+border-radius: 25px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+font-size: 1em;
+position: relative;
+overflow: hidden;
+ }
+.btn-primary:disabled {
+background: rgba(128, 128, 128, 0.5);
+cursor: not-allowed;
+transform: none;
+box-shadow: none;
+ }
+.btn-primary::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+transition: left 0.5s ease;
+ }
+.btn-primary:hover:not(:disabled)::before {
+left: 100%;
+ }
+.btn-primary:hover:not(:disabled) {
+background: linear-gradient(45deg, #FF6B6B, #DC143C);
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
+ }
+.btn-secondary {
+padding: 12px 20px;
+background: rgba(255, 255, 255, 0.1);
+color: white;
+border: 2px solid rgba(220, 20, 60, 0.3);
+border-radius: 20px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+ }
+.btn-secondary:hover {
+background: rgba(220, 20, 60, 0.2);
+border-color: rgba(220, 20, 60, 0.5);
+transform: translateY(-2px);
+ }
+.btn-remove {
+background: rgba(245, 158, 11, 0.2);
+border: 2px solid rgba(245, 158, 11, 0.3);
+color: #f59e0b;
+ }
+.btn-remove:hover {
+background: rgba(245, 158, 11, 0.3);
+border-color: rgba(245, 158, 11, 0.5);
+ }
+/* Order Summary */
+.order-items {
+list-style: none;
+margin-bottom: 30px;
+ }
+.order-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 15px 0;
+border-bottom: 1px solid rgba(220, 20, 60, 0.2);
+ }
+.order-item:last-child {
+border-bottom: none;
+ }
+.item-details {
+flex: 1;
+ }
+.item-name {
+font-weight: 600;
+margin-bottom: 5px;
+ }
+.item-quantity {
+color: rgba(255, 255, 255, 0.7);
+font-size: 0.9em;
+ }
+.item-price {
+font-weight: 700;
+color: #FF6B6B;
+ }
+.total-section {
+background: rgba(220, 20, 60, 0.1);
+border: 2px solid rgba(220, 20, 60, 0.3);
+border-radius: 20px;
+padding: 25px;
+margin-bottom: 30px;
+ }
+.total-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 1.3em;
+font-weight: 700;
+ }
+.total-amount {
+color: #FF6B6B;
+font-size: 1.5em;
+ }
+.place-order-btn {
+width: 100%;
+padding: 20px;
+font-size: 1.2em;
+text-transform: uppercase;
+letter-spacing: 1px;
+ }
+.saved-info {
+background: rgba(34, 197, 94, 0.1);
+border: 2px solid rgba(34, 197, 94, 0.3);
+border-radius: 15px;
+padding: 15px;
+margin-bottom: 20px;
+color: #22c55e;
+font-weight: 600;
+ }
+.card-option {
+background: rgba(255, 255, 255, 0.03);
+border: 2px solid rgba(220, 20, 60, 0.2);
+border-radius: 20px;
+padding: 20px;
+margin-bottom: 20px;
+transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+cursor: pointer;
+position: relative;
+overflow: hidden;
+ }
+.card-option::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(220, 20, 60, 0.05), transparent);
+transition: left 0.6s ease;
+ }
+.card-option:hover {
+border-color: rgba(220, 20, 60, 0.4);
+background: rgba(255, 255, 255, 0.08);
+transform: translateY(-2px);
+box-shadow: 0 8px 25px rgba(220, 20, 60, 0.15);
+ }
+.card-option:hover::before {
+left: 100%;
+ }
+.card-option.selected {
+border-color: #DC143C;
+background: rgba(220, 20, 60, 0.08);
+box-shadow: 0 0 20px rgba(220, 20, 60, 0.3);
+transform: scale(1.02);
+ }
+.card-option.selected::after {
+content: '✓';
+position: absolute;
+top: 15px;
+right: 20px;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+color: white;
+border-radius: 50%;
+width: 24px;
+height: 24px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 14px;
+font-weight: bold;
+ }
+.card-option input[type="radio"] {
+appearance: none;
+width: 20px;
+height: 20px;
+border: 2px solid rgba(220, 20, 60, 0.5);
+border-radius: 50%;
+margin-right: 15px;
+position: relative;
+transition: all 0.3s ease;
+cursor: pointer;
+flex-shrink: 0;
+ }
+.card-option input[type="radio"]:checked {
+border-color: #DC143C;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+ }
+.card-option input[type="radio"]:checked::after {
+content: '';
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 8px;
+height: 8px;
+background: white;
+border-radius: 50%;
+ }
+.card-info {
+display: flex;
+align-items: center;
+gap: 15px;
+width: 100%;
+ }
+.card-details {
+flex: 1;
+ }
+.card-number {
+font-size: 1.1em;
+font-weight: 600;
+margin-bottom: 5px;
+display: flex;
+align-items: center;
+gap: 10px;
+ }
+.card-meta {
+font-size: 0.9em;
+color: rgba(255, 255, 255, 0.7);
+display: flex;
+align-items: center;
+gap: 15px;
+ }
+.new-card-option {
+border-style: dashed;
+border-color: rgba(220, 20, 60, 0.3);
+ }
+.new-card-option:hover {
+border-style: solid;
+ }
+.new-card-title {
+font-size: 1.1em;
+font-weight: 600;
+color: rgba(255, 255, 255, 0.9);
+margin-bottom: 8px;
+display: flex;
+align-items: center;
+gap: 10px;
+ }
+.new-card-fields {
+margin-top: 15px;
+display: none;
+ }
+.new-card-fields.active {
+display: block;
+ }
+.new-card-fields .text-box {
+margin-bottom: 10px;
+ }
+/* Responsive Design */
+@media (max-width: 1024px) {
+.navbar {
+flex-direction: column;
+gap: 20px;
+padding: 20px;
+ }
+.search-container {
+max-width: 100%;
+margin: 0;
+ }
+.nav-buttons {
+justify-content: center;
+flex-wrap: wrap;
+ }
+.checkout-form {
+grid-template-columns: 1fr;
+gap: 30px;
+ }
+.form-row {
+grid-template-columns: 1fr;
+gap: 10px;
+ }
+ }
+@media (max-width: 768px) {
+.container {
+padding: 0 20px 40px;
+ }
+.header-content h1 {
+font-size: 2.5em;
+ }
+.checkout-section {
+padding: 30px 25px;
+ }
+.promo-input-group {
+flex-direction: column;
+ }
+ }
+/* Animation for sections */
+@keyframes slideInUp {
+ from {
+opacity: 0;
+transform: translateY(30px);
+ }
+ to {
+opacity: 1;
+transform: translateY(0);
+ }
+ }
+.checkout-section {
+animation: slideInUp 0.6s ease forwards;
+ }
+.checkout-section:nth-child(1) { animation-delay: 0.1s; }
+.checkout-section:nth-child(2) { animation-delay: 0.2s; }
+</style>
 </head>
 <body>
-    <h1 class="bookstore">Bookstore</h1>
-   <h2 class="header">Checkout</h2>
-   
-
-<form method="post">
-    {% csrf_token %}
-    <div class="body-checkout">
-        <div class="left-side">
-            <h3>Shipping Address</h3>
-<input type="text" name="street" placeholder="Street" value="{{ saved_address.street|default_if_none:'' }}" class="text-box" required><br><br>
-<input type="text" name="city" placeholder="City" value="{{ saved_address.city|default_if_none:'' }}" class="text-box" required><br><br>
-<input type="text" name="state" placeholder="State" value="{{ saved_address.state|default_if_none:'' }}" class="text-box" required><br><br>
-<input type="text" name="zip_code" placeholder="Zip Code" value="{{ saved_address.zip_code|default_if_none:'' }}" class="text-box" required><br><br>
-
-            <button type="button" onclick="document.querySelector('[name=address]').value=''">Change</button>
-
-            <h3>Payment Card</h3>
-            {% if saved_card %}
-                <p>Saved Card: **** **** **** {{ saved_card }}</p>
-            {% endif %}
-            <input type="text" name="card_last4" maxlength="4" placeholder="Last 4 digits" value="{{ saved_card|default:'' }}" required class="text-box">
-            <button type="button" onclick="document.querySelector('[name=card_last4]').value=''">Change</button>
-        </div>
-
-        <div class="right-side">
-            <h3>Order Summary</h3>
-            <ul>
-                {% for item in cart_items %}
-                    <li>{{ item.book.title }} x{{ item.quantity }} — ${{ item.book.selling_price|floatformat:2 }}</li>
-                {% endfor %}
-            </ul>
-            <button type="submit" class="submit-button">Place Order</button>
-        </div>
-</form>
-    
+<!-- Animated background -->
+<div class="bg-decoration">
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
 </div>
-    <a href="{% url 'store_home' %}" class="back-home">← Back to Home</a>
+<div class="navbar">
+<div class="logo">📚 Online Bookstore</div>
+<form method="get" action="{% url 'search_books' %}" class="search-container">
+<input type="text" class="search" name="q" placeholder="Search by title, author, or category">
+<button type="submit" class="search-btn">Search</button>
+</form>
+<div class="nav-buttons">
+ {% if user.is_authenticated %}
+ {% if not user.is_staff %}
+<a href="{% url 'profile' %}" class="btn-nav">👤 Profile</a>
+<a href="{% url 'order_history' %}" class="btn-nav">📦 Order History</a>
+<a href="{% url 'view_promotions' %}" class="btn-nav">🎁 Promotions</a>
+ {% endif %}
+<a href="{% url 'cart_view' %}" class="btn-nav">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+<a href="{% url 'logout' %}" class="btn-nav">Logout</a>
+ {% else %}
+<a href="{% url 'login' %}" class="btn-nav">Login</a>
+<a href="{% url 'signup' %}" class="btn-nav">Sign Up</a>
+<a href="{% url 'cart_view' %}" class="btn-nav">🛒 Cart <span id="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span></a>
+ {% endif %}
+</div>
+</div>
+<!-- Header Section -->
+<div class="header-section">
+<div class="header-content">
+<h1>🛒 Checkout</h1>
+<p>Complete your order and get your favorite books delivered to you!</p>
+<a href="{% url 'store_home' %}" class="back-to-home">
+<span>🏠</span>
+<span>Back to Home</span>
+</a>
+</div>
+</div>
+<!-- Main Content -->
+<div class="container">
+<form method="post" id="checkout-form">
+ {% csrf_token %}
+<div class="checkout-form">
+<!-- Left Side - Shipping & Payment -->
+<div class="checkout-section">
+<div class="section-content">
+<h2 class="section-title">
+<span>📦</span>
+<span>Shipping & Payment</span>
+</h2>
+<!-- Shipping Address -->
+<h3 class="subsection-title">
+<span>🏠</span>
+<span>Shipping Address</span>
+</h3>
+<div class="form-group">
+<input type="text" name="street" placeholder="Street Address"
+value="{{ saved_address.street|default_if_none:'' }}"
+class="text-box" required>
+</div>
+<div class="form-group">
+<input type="text" name="city" placeholder="City"
+value="{{ saved_address.city|default_if_none:'' }}"
+class="text-box" required>
+</div>
+<div class="form-group">
+<input type="text" name="state" placeholder="State"
+value="{{ saved_address.state|default_if_none:'' }}"
+class="text-box" required>
+</div>
+<div class="form-group">
+<input type="text" name="zip_code" placeholder="Zip Code"
+value="{{ saved_address.zip_code|default_if_none:'' }}"
+class="text-box" required>
+</div>
+<h3 class="subsection-title">
+<span>💳</span>
+<span>Payment Card</span>
+</h3>
+<!-- Saved Cards -->
+ {% if saved_cards %}
+ {% for card in saved_cards %}
+<div class="card-option">
+<label class="card-info">
+<input type="radio" name="selected_card" value="{{ card.id }}" required>
+<div class="card-details">
+<div class="card-number">
+<span>💳</span> {{ card.card_type }} - {{ card.masked_number }}
+</div>
+<div class="card-meta">
+<span>Exp: {{ card.expiration_date }}</span>
+</div>
+</div>
+</label>
+</div>
+ {% endfor %}
+ {% endif %}
+<!-- New Card Option -->
+<div class="card-option new-card-option">
+<label class="card-info">
+<input type="radio" name="selected_card" value="new" id="radio-new-card" {% if not saved_cards %}required{% endif %}>
+<div class="card-details">
+<div class="new-card-title">
+<span>✨</span> Add New Card
+</div>
+<div class="card-meta">Enter your card details below</div>
+<div class="new-card-fields" id="new-card-fields">
+<select name="card_type" class="text-box" id="card_type">
+<option value="">Select Card Type</option>
+<option value="Visa">Visa</option>
+<option value="Mastercard">Mastercard</option>
+<option value="American Express">American Express</option>
+<option value="Discover">Discover</option>
+</select>
+<input type="text" name="card_name" placeholder="Name on Card"
+class="text-box" id="card_name">
+<input type="text" name="card_number" maxlength="16" placeholder="Card Number (16 digits)"
+class="text-box" id="card_number">
+<div class="form-row">
+<input type="text" name="card_expiration" maxlength="5" placeholder="MM/YY"
+class="text-box" id="card_expiration">
+<input type="text" name="card_cvv" maxlength="4" placeholder="CVV (3-4 digits)"
+class="text-box" id="card_cvv">
+</div>
+<input type="text" name="card_zipcode" maxlength="5" placeholder="ZIP Code (5 digits)"
+class="text-box" id="card_zipcode">
+</div>
+</div>
+</label>
+</div>
+<!-- Promo Code -->
+<h3 class="subsection-title">
+<span>🎁</span>
+<span>Promo Code</span>
+</h3>
+<div class="promo-section">
+<div id="promo-section">
+ {% if applied_promo %}
+<div class="promo-applied">
+<span>
+<span>✅</span>
+ Promo "<strong id="promo-name">{{ applied_promo }}</strong>" applied
+</span>
+<button type="button" onclick="clearPromo()" class="btn-secondary btn-remove">
+ Remove
+</button>
+</div>
+ {% else %}
+<div class="promo-input-group">
+<input type="text" id="promo_code" placeholder="Enter promo code" class="text-box promo-input">
+<button type="button" onclick="applyPromo()" class="btn-secondary">Apply</button>
+</div>
+<p id="promo-message" class="promo-message"></p>
+ {% endif %}
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side - Order Summary -->
+<div class="checkout-section">
+<div class="section-content">
+<h2 class="section-title">
+<span>📋</span>
+<span>Order Summary</span>
+</h2>
+<ul class="order-items">
+ {% for item in cart_items %}
+<li class="order-item">
+<div class="item-details">
+<div class="item-name">{{ item.book.title }}</div>
+<div class="item-quantity">Quantity: {{ item.quantity }}</div>
+</div>
+<div class="item-price">${{ item.book.selling_price|floatformat:2 }}</div>
+</li>
+ {% endfor %}
+</ul>
+<div class="total-section">
+<div class="total-row">
+<span>Total (after tax):</span>
+<span id="total">{{ total_after_tax|floatformat:2 }}</span>
+</div>
+</div>
+<button type="submit" class="btn-primary place-order-btn" id="place-order-btn">
+<span>🚀</span>
+<span>Place Order</span>
+</button>
+</div>
+</div>
+</div>
+</form>
+</div>
+<script>
+const originalTotal = parseFloat("{{ total_before|floatformat:2 }}") * 1.07;
+function applyPromo() {
+const code = document.getElementById('promo_code').value;
+if (!code.trim()) {
+showPromoMessage('Please enter a promo code', 'error');
+return;
+ }
+fetch("{% url 'apply_promo' %}?code=" + encodeURIComponent(code))
+ .then(res => res.json())
+ .then(data => {
+if (data.success) {
+document.getElementById("total").textContent = parseFloat(data.new_total).toFixed(2);
+document.getElementById("promo-section").innerHTML = `
+ <div class="promo-applied">
+ <span>
+ <span>✅</span>
+ Promo "<strong>${code}</strong>" applied
+ </span>
+ <button type="button" id="remove-promo-btn" class="btn-secondary btn-remove">
+ Remove
+ </button>
+ </div>
+ `;
+document.getElementById("remove-promo-btn").addEventListener("click", clearPromo);
+ } else {
+showPromoMessage(data.message, 'error');
+ }
+ })
+ .catch(err => {
+showPromoMessage('Failed to apply promo code', 'error');
+console.error('Error:', err);
+ });
+ }
+function clearPromo() {
+fetch("{% url 'clear_promo' %}")
+ .then(res => res.json())
+ .then(data => {
+if (data.success) {
+document.getElementById("promo-section").innerHTML = `
+ <div class="promo-input-group">
+ <input type="text" id="promo_code" placeholder="Enter promo code" class="text-box promo-input">
+ <button type="button" onclick="applyPromo()" class="btn-secondary">Apply</button>
+ </div>
+ <p id="promo-message" class="promo-message"></p>
+ `;
+document.getElementById("total").textContent = originalTotal.toFixed(2);
+ }
+ })
+ .catch(err => {
+console.error('Error:', err);
+ });
+ }
+function showPromoMessage(message, type) {
+const msgElem = document.getElementById("promo-message");
+if (msgElem) {
+msgElem.textContent = message;
+msgElem.className = `promo-message ${type}`;
+setTimeout(() => {
+msgElem.textContent = '';
+msgElem.className = 'promo-message';
+ }, 5000);
+ }
+ }
+function showNotification(message, type) {
+const notification = document.createElement('div');
+notification.className = `notification ${type}`;
+notification.textContent = message;
+notification.style.cssText = `
+ position: fixed;
+ top: 20px;
+ right: 20px;
+ padding: 15px 25px;
+ border-radius: 10px;
+ font-weight: 600;
+ z-index: 10000;
+ transform: translateX(400px);
+ transition: transform 0.3s ease;
+${type === 'error' ? 'background: rgba(245, 158, 11, 0.9); color: white;' : 'background: rgba(34, 197, 94, 0.9); color: white;'}
+ `;
+document.body.appendChild(notification);
+setTimeout(() => { notification.style.transform = 'translateX(0)'; }, 100);
+setTimeout(() => {
+notification.style.transform = 'translateX(400px)';
+setTimeout(() => { notification.remove(); }, 300);
+ }, 5000);
+ }
+function showInputError(input, message) {
+input.classList.add('error');
+// Remove existing error message
+const existingError = input.parentNode.querySelector('.error-message');
+if (existingError) existingError.remove();
+// Add new error message
+const errorDiv = document.createElement('div');
+errorDiv.className = 'error-message';
+errorDiv.textContent = message;
+input.parentNode.appendChild(errorDiv);
+ }
+function clearInputError(input) {
+input.classList.remove('error');
+const errorMsg = input.parentNode.querySelector('.error-message');
+if (errorMsg) errorMsg.remove();
+ }
+function validateCardNumber(number) {
+return /^\d{16}$/.test(number);
+ }
+function validateExpiration(exp) {
+if (!/^\d{2}\/\d{2}$/.test(exp)) return false;
+const [month, year] = exp.split('/').map(num => parseInt(num));
+if (month < 1 || month > 12) return false;
+const currentYear = new Date().getFullYear() % 100;
+const currentMonth = new Date().getMonth() + 1;
+if (year < currentYear || (year === currentYear && month < currentMonth)) return false;
+return true;
+ }
+function validateCVV(cvv) {
+return /^\d{3,4}$/.test(cvv);
+ }
+function validateZipCode(zip) {
+return /^\d{5}(-\d{4})?$/.test(zip);
+ }
+function validateName(name) {
+return name.trim().length >= 2;
+ }
+function formatCardNumber(input) {
+// Remove all non-digit characters and limit to 16 digits
+let value = input.value.replace(/\D/g, '').substring(0, 16);
+input.value = value;
+ }
+function formatExpiration(input) {
+let value = input.value.replace(/\D/g, '');
+if (value.length >= 2) {
+value = value.substring(0, 2) + '/' + value.substring(2, 4);
+ }
+input.value = value;
+ }
+function formatCVV(input) {
+// Remove all non-digit characters and limit to 4 digits
+let value = input.value.replace(/\D/g, '').substring(0, 4);
+input.value = value;
+ }
+function formatZipCode(input) {
+// Remove all non-digit characters and limit to 5 digits
+let value = input.value.replace(/\D/g, '').substring(0, 5);
+input.value = value;
+ }
+document.addEventListener('DOMContentLoaded', function () {
+const form = document.getElementById('checkout-form');
+const newCardRadio = document.getElementById("radio-new-card");
+const newCardFields = document.getElementById("new-card-fields");
+const cardTypeSelect = document.getElementById("card_type");
+const cardNameInput = document.getElementById("card_name");
+const cardNumberInput = document.getElementById("card_number");
+const cardExpInput = document.getElementById("card_expiration");
+const cardCvvInput = document.getElementById("card_cvv");
+const cardZipcodeInput = document.getElementById("card_zipcode");
+const placeOrderBtn = document.getElementById("place-order-btn");
+// Handle radio button changes for card selection
+document.querySelectorAll('input[name="selected_card"]').forEach(radio => {
+radio.addEventListener('change', function() {
+const cardOptions = document.querySelectorAll('.card-option');
+cardOptions.forEach(option => option.classList.remove('selected'));
+if (this.value === 'new') {
+newCardFields.classList.add('active');
+this.closest('.card-option').classList.add('selected');
+// Make new card fields required
+cardTypeSelect.setAttribute('required', '');
+cardNameInput.setAttribute('required', '');
+cardNumberInput.setAttribute('required', '');
+cardExpInput.setAttribute('required', '');
+cardCvvInput.setAttribute('required', '');
+cardZipcodeInput.setAttribute('required', '');
+ } else {
+newCardFields.classList.remove('active');
+this.closest('.card-option').classList.add('selected');
+// Remove required from new card fields
+cardTypeSelect.removeAttribute('required');
+cardNameInput.removeAttribute('required');
+cardNumberInput.removeAttribute('required');
+cardExpInput.removeAttribute('required');
+cardCvvInput.removeAttribute('required');
+cardZipcodeInput.removeAttribute('required');
+// Clear any errors on new card fields
+clearInputError(cardTypeSelect);
+clearInputError(cardNameInput);
+clearInputError(cardNumberInput);
+clearInputError(cardExpInput);
+clearInputError(cardCvvInput);
+clearInputError(cardZipcodeInput);
+ }
+ });
+ });
+// Format card inputs as user types
+cardNumberInput.addEventListener('input', function() {
+formatCardNumber(this);
+clearInputError(this);
+ });
+cardExpInput.addEventListener('input', function() {
+formatExpiration(this);
+clearInputError(this);
+ });
+cardCvvInput.addEventListener('input', function() {
+formatCVV(this);
+clearInputError(this);
+ });
+cardZipcodeInput.addEventListener('input', function() {
+formatZipCode(this);
+clearInputError(this);
+ });
+// Clear errors when user starts typing
+const allInputs = document.querySelectorAll('.text-box, select');
+allInputs.forEach(input => {
+input.addEventListener('input', function() {
+clearInputError(this);
+ });
+ });
+// Form submission validation
+form.addEventListener('submit', function (e) {
+let isValid = true;
+const selectedCard = document.querySelector('input[name="selected_card"]:checked');
+// Validate required fields
+const requiredFields = form.querySelectorAll('[required]');
+requiredFields.forEach(field => {
+if (!field.value.trim()) {
+showInputError(field, 'This field is required');
+isValid = false;
+ }
+ });
+// Validate shipping zip code
+const shippingZipInput = document.querySelector('input[name="zip_code"]');
+if (shippingZipInput.value.trim() && !validateZipCode(shippingZipInput.value.trim())) {
+showInputError(shippingZipInput, 'Please enter a valid zip code (12345 or 12345-6789)');
+isValid = false;
+ }
+// If new card is selected, validate card fields
+if (selectedCard && selectedCard.value === 'new') {
+const cardType = cardTypeSelect.value.trim();
+const cardName = cardNameInput.value.trim();
+const cardNumber = cardNumberInput.value.trim();
+const cardExp = cardExpInput.value.trim();
+const cardCvv = cardCvvInput.value.trim();
+const cardZipcode = cardZipcodeInput.value.trim();
+if (!cardType) {
+showInputError(cardTypeSelect, 'Please select a card type');
+isValid = false;
+ }
+if (!cardName) {
+showInputError(cardNameInput, 'Name on card is required');
+isValid = false;
+ } else if (!validateName(cardName)) {
+showInputError(cardNameInput, 'Please enter a valid name (at least 2 characters)');
+isValid = false;
+ }
+if (!cardNumber) {
+showInputError(cardNumberInput, 'Card number is required');
+isValid = false;
+ } else if (!validateCardNumber(cardNumber)) {
+showInputError(cardNumberInput, 'Please enter a valid 16-digit card number');
+isValid = false;
+ }
+if (!cardExp) {
+showInputError(cardExpInput, 'Expiration date is required');
+isValid = false;
+ } else if (!validateExpiration(cardExp)) {
+showInputError(cardExpInput, 'Please enter a valid expiration date (MM/YY) in the future');
+isValid = false;
+ }
+if (!cardCvv) {
+showInputError(cardCvvInput, 'CVV is required');
+isValid = false;
+ } else if (!validateCVV(cardCvv)) {
+showInputError(cardCvvInput, 'Please enter a valid 3-4 digit CVV');
+isValid = false;
+ }
+if (!cardZipcode) {
+showInputError(cardZipcodeInput, 'ZIP code is required');
+isValid = false;
+ } else if (!validateZipCode(cardZipcode)) {
+showInputError(cardZipcodeInput, 'Please enter a valid 5-digit ZIP code');
+isValid = false;
+ }
+ }
+// Check if any payment method is selected
+if (!selectedCard) {
+showNotification('Please select a payment method', 'error');
+isValid = false;
+ }
+if (!isValid) {
+e.preventDefault();
+showNotification('Please correct the errors above before placing your order', 'error');
+// Scroll to first error
+const firstError = document.querySelector('.text-box.error, select.error');
+if (firstError) {
+firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+firstError.focus();
+ }
+ } else {
+// Disable button to prevent double submission
+placeOrderBtn.disabled = true;
+placeOrderBtn.innerHTML = '<span>⏳</span><span>Processing...</span>';
+ }
+ });
+// Initialize: if no saved cards, automatically select new card option
+const savedCards = document.querySelectorAll('input[name="selected_card"]:not([value="new"])');
+if (savedCards.length === 0) {
+newCardRadio.checked = true;
+newCardFields.classList.add('active');
+newCardRadio.closest('.card-option').classList.add('selected');
+// Make new card fields required
+cardTypeSelect.setAttribute('required', '');
+cardNameInput.setAttribute('required', '');
+cardNumberInput.setAttribute('required', '');
+cardExpInput.setAttribute('required', '');
+cardCvvInput.setAttribute('required', '');
+cardZipcodeInput.setAttribute('required', '');
+ }
+ });
+</script>
 </body>
 </html>

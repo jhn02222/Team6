@@ -418,13 +418,14 @@
 <main class="auth-page">
     <div class="auth-box">
         <h2>Login</h2>
-        {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+      {% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+    <li class="{{ message.tags }}">{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
         <form method="POST">
             {% csrf_token %}
             <p>
