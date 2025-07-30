@@ -170,8 +170,6 @@ def verify_email(request, token):
 
 @require_http_methods(["GET", "POST"])
 @never_cache
-@require_http_methods(["GET", "POST"])
-@never_cache
 def login_view(request):
     """Handle user login with optional 'remember me'."""
     if request.user.is_authenticated:
@@ -187,14 +185,14 @@ def login_view(request):
             user = _find_user_by_identifier(identifier)
             
             if not user:
-                messages.error(request, 'No user found with that email or account ID.', extra_tags='login')
+                messages.error(request, 'No user found with that email or account ID.', extra_tags='auth')
             elif not user.check_password(password):
-                messages.error(request, 'Incorrect password.', extra_tags='login')
+                messages.error(request, 'Incorrect password.', extra_tags='auth')
             elif user.status == "Suspended":
-                messages.error(request, 'Your account has been suspended.', extra_tags='login')
+                messages.error(request, 'Your account has been suspended.', extra_tags='auth')
             elif user.status == "Inactive":
                 _send_verification_email(request, user)
-                messages.warning(request, 'Please verify your email; we sent you another link.', extra_tags='login')
+                messages.warning(request, 'Please verify your email; we sent you another link.', extra_tags='auth')
             else:
                 login(request, user)
 
@@ -218,6 +216,22 @@ def login_view(request):
         form = LoginForm()
     
     return render(request, 'accounts/login.html', {'form': form})
+
+
+@require_http_methods(["GET", "POST"])
+@csrf_protect
+def logout_view(request):
+    """Logout and reset CSRF token."""
+    if request.user.is_authenticated:
+        logger.info(f"User {request.user.email} logged out")
+        logout(request)
+        messages.success(request, 'You have been logged out successfully.', extra_tags='auth')
+
+    # Rotate the CSRF token (this sets a new one in the session)
+    rotate_token(request)
+
+    # Redirect to home
+    return redirect('store_home')
 
 # Also add this view to check session status (for debugging)
 @login_required

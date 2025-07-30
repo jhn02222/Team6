@@ -1,662 +1,1024 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Promotion - Admin Panel</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #ffffff;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* Animated background elements */
-        .bg-decoration {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .floating-shape {
-            position: absolute;
-            background: linear-gradient(45deg, rgba(220, 20, 60, 0.1), rgba(139, 0, 0, 0.1));
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .floating-shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 15%;
-            left: 8%;
-            animation-delay: 0s;
-        }
-
-        .floating-shape:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            top: 60%;
-            right: 15%;
-            animation-delay: 2s;
-        }
-
-        .floating-shape:nth-child(3) {
-            width: 60px;
-            height: 60px;
-            bottom: 25%;
-            left: 25%;
-            animation-delay: 4s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-
-        /* Navbar */
-        .navbar {
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(220, 20, 60, 0.3);
-        }
-
-        .navbar .logo {
-            font-size: 1.8em;
-            font-weight: 800;
-            background: linear-gradient(45deg, #DC143C, #FF6B6B);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(220, 20, 60, 0.5);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .back-btn, .logout-btn {
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(220, 20, 60, 0.3);
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .back-btn:hover, .logout-btn:hover {
-            background: rgba(220, 20, 60, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
-        }
-
-        /* Header Section */
-        .header-section {
-            padding: 60px 40px 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="promotions" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="none"/><text x="50" y="50" text-anchor="middle" font-size="40" fill="rgba(220,20,60,0.03)">📢</text></pattern></defs><rect width="100" height="100" fill="url(%23promotions)"/></svg>');
-            animation: bgMove 25s linear infinite;
-        }
-
-        @keyframes bgMove {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100px); }
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .header-content h1 {
-            font-size: 3em;
-            font-weight: 900;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #DC143C, #FF6B6B, #FFB347);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 40px rgba(220, 20, 60, 0.3);
-        }
-
-        .header-content p {
-            font-size: 1.2em;
-            color: rgba(255, 255, 255, 0.8);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Form Section */
-        .form-section {
-            padding: 40px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .form-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 30px;
-            overflow: hidden;
-            border: 1px solid rgba(220, 20, 60, 0.2);
-            backdrop-filter: blur(15px);
-            position: relative;
-        }
-
-        .form-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(220, 20, 60, 0.05), transparent);
-            opacity: 0.5;
-        }
-
-        .form-content {
-            position: relative;
-            z-index: 2;
-            padding: 60px 50px;
-        }
-
-        /* Promotion Icon Section */
-        .promotion-icon {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .icon-display {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(45deg, rgba(220, 20, 60, 0.2), rgba(255, 107, 107, 0.2));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            margin: 0 auto 20px;
-            border: 2px solid rgba(220, 20, 60, 0.3);
-            backdrop-filter: blur(10px);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(220, 20, 60, 0.2); }
-            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(220, 20, 60, 0.4); }
-        }
-
-        .icon-subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.1em;
-            font-weight: 500;
-        }
-
-        /* Form Fields */
-        .field-group {
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.95em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 18px 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(220, 20, 60, 0.2);
-            border-radius: 15px;
-            color: #ffffff;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            font-family: inherit;
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #DC143C;
-            background: rgba(220, 20, 60, 0.1);
-            box-shadow: 0 0 20px rgba(220, 20, 60, 0.2);
-            transform: translateY(-2px);
-        }
-
-        input::placeholder, textarea::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Select styling */
-        select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 20px;
-        }
-
-        /* Checkbox styling */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(220, 20, 60, 0.2);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .checkbox-group:hover {
-            border-color: rgba(220, 20, 60, 0.4);
-            background: rgba(220, 20, 60, 0.05);
-        }
-
-        input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            accent-color: #DC143C;
-            cursor: pointer;
-            margin: 0;
-        }
-
-        .checkbox-group label {
-            margin: 0;
-            cursor: pointer;
-            text-transform: none;
-            letter-spacing: normal;
-            font-size: 1em;
-        }
-
-        /* Send Button */
-        .send-button {
-            width: 100%;
-            padding: 20px 50px;
-            background: linear-gradient(45deg, #DC143C, #FF6B6B);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.2em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .send-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .send-button:hover::before {
-            left: 100%;
-        }
-
-        .send-button:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 35px rgba(220, 20, 60, 0.4);
-        }
-
-        .send-button:active {
-            transform: translateY(-1px) scale(0.98);
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 20px;
-                padding: 20px;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .header-content h1 {
-                font-size: 2.2em;
-            }
-
-            .form-content {
-                padding: 40px 30px;
-            }
-
-            .form-section {
-                padding: 20px;
-            }
-
-            .icon-display {
-                width: 80px;
-                height: 80px;
-                font-size: 2em;
-            }
-        }
-
-        /* Animation for form elements */
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .field-group {
-            animation: slideInUp 0.6s ease forwards;
-        }
-
-        .field-group:nth-child(1) { animation-delay: 0.1s; }
-        .field-group:nth-child(2) { animation-delay: 0.2s; }
-        .field-group:nth-child(3) { animation-delay: 0.3s; }
-        .field-group:nth-child(4) { animation-delay: 0.4s; }
-        .field-group:nth-child(5) { animation-delay: 0.5s; }
-        .field-group:nth-child(6) { animation-delay: 0.6s; }
-        .field-group:nth-child(7) { animation-delay: 0.7s; }
-
-        .promotion-icon {
-            animation: slideInUp 0.6s ease forwards;
-            animation-delay: 0.05s;
-        }
-
-        /* Success message styling */
-        .success-message {
-            background: rgba(34, 197, 94, 0.1);
-            border: 2px solid rgba(34, 197, 94, 0.3);
-            color: #22c55e;
-            padding: 15px 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-            display: none;
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            padding: 15px 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Promotion - Admin Panel</title>
+{% load static %}
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ }
+body {
+background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+color: #ffffff;
+overflow-x: hidden;
+min-height: 100vh;
+ }
+/* Animated background elements */
+.bg-decoration {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: -1;
+ }
+.floating-shape {
+position: absolute;
+background: linear-gradient(45deg, rgba(220, 20, 60, 0.1), rgba(139, 0, 0, 0.1));
+border-radius: 50%;
+animation: float 6s ease-in-out infinite;
+ }
+.floating-shape:nth-child(1) {
+width: 80px;
+height: 80px;
+top: 15%;
+left: 8%;
+animation-delay: 0s;
+ }
+.floating-shape:nth-child(2) {
+width: 120px;
+height: 120px;
+top: 60%;
+right: 15%;
+animation-delay: 2s;
+ }
+.floating-shape:nth-child(3) {
+width: 60px;
+height: 60px;
+bottom: 25%;
+left: 25%;
+animation-delay: 4s;
+ }
+@keyframes float {
+ 0%, 100% { transform: translateY(0px) rotate(0deg); }
+ 50% { transform: translateY(-20px) rotate(180deg); }
+ }
+/* Navbar */
+.navbar {
+background: rgba(15, 15, 15, 0.95);
+backdrop-filter: blur(20px);
+padding: 20px 40px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: sticky;
+top: 0;
+z-index: 1000;
+border-bottom: 1px solid rgba(220, 20, 60, 0.3);
+ }
+.navbar .logo {
+font-size: 1.8em;
+font-weight: 800;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-shadow: 0 0 30px rgba(220, 20, 60, 0.5);
+ }
+.nav-links {
+display: flex;
+gap: 20px;
+align-items: center;
+ }
+.back-btn, .logout-btn {
+padding: 10px 20px;
+background: rgba(255, 255, 255, 0.1);
+color: white;
+border: 1px solid rgba(220, 20, 60, 0.3);
+border-radius: 25px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+text-decoration: none;
+display: inline-block;
+ }
+.back-btn:hover, .logout-btn:hover {
+background: rgba(220, 20, 60, 0.2);
+transform: translateY(-2px);
+box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
+ }
+/* Header Section */
+.header-section {
+padding: 60px 40px 40px;
+text-align: center;
+position: relative;
+overflow: hidden;
+ }
+.header-section::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="promotions" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="none"/><text x="50" y="50" text-anchor="middle" font-size="40" fill="rgba(220,20,60,0.03)">📢</text></pattern></defs><rect width="100" height="100" fill="url(%23promotions)"/></svg>');
+animation: bgMove 25s linear infinite;
+ }
+@keyframes bgMove {
+ 0% { transform: translateX(0); }
+ 100% { transform: translateX(-100px); }
+ }
+.header-content {
+position: relative;
+z-index: 2;
+ }
+.header-content h1 {
+font-size: 3em;
+font-weight: 900;
+margin-bottom: 15px;
+background: linear-gradient(45deg, #DC143C, #FF6B6B, #FFB347);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-shadow: 0 0 40px rgba(220, 20, 60, 0.3);
+ }
+.header-content p {
+font-size: 1.2em;
+color: rgba(255, 255, 255, 0.8);
+max-width: 600px;
+margin: 0 auto;
+ }
+/* Form Section */
+.form-section {
+padding: 40px;
+max-width: 800px;
+margin: 0 auto;
+ }
+.form-container {
+background: rgba(255, 255, 255, 0.05);
+border-radius: 30px;
+overflow: hidden;
+border: 1px solid rgba(220, 20, 60, 0.2);
+backdrop-filter: blur(15px);
+position: relative;
+ }
+.form-container::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: linear-gradient(45deg, transparent, rgba(220, 20, 60, 0.05), transparent);
+opacity: 0.5;
+ }
+.form-content {
+position: relative;
+z-index: 2;
+padding: 60px 50px;
+ }
+/* Promotion Icon Section */
+.promotion-icon {
+text-align: center;
+margin-bottom: 40px;
+ }
+.icon-display {
+width: 120px;
+height: 120px;
+background: linear-gradient(45deg, rgba(220, 20, 60, 0.2), rgba(255, 107, 107, 0.2));
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 3em;
+margin: 0 auto 20px;
+border: 2px solid rgba(220, 20, 60, 0.3);
+backdrop-filter: blur(10px);
+animation: pulse 2s ease-in-out infinite;
+ }
+@keyframes pulse {
+ 0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(220, 20, 60, 0.2); }
+ 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(220, 20, 60, 0.4); }
+ }
+.icon-subtitle {
+color: rgba(255, 255, 255, 0.7);
+font-size: 1.1em;
+font-weight: 500;
+ }
+/* Form Fields */
+.field-group {
+margin-bottom: 30px;
+position: relative;
+ }
+label {
+display: block;
+font-weight: 600;
+margin-bottom: 8px;
+color: rgba(255, 255, 255, 0.9);
+font-size: 0.95em;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+ }
+input, select, textarea {
+width: 100%;
+padding: 18px 25px;
+background: rgba(255, 255, 255, 0.05);
+border: 2px solid rgba(220, 20, 60, 0.2);
+border-radius: 15px;
+color: #ffffff;
+font-size: 1em;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+font-family: inherit;
+ }
+textarea {
+min-height: 120px;
+resize: vertical;
+ }
+input:focus, select:focus, textarea:focus {
+outline: none;
+border-color: #DC143C;
+background: rgba(220, 20, 60, 0.1);
+box-shadow: 0 0 20px rgba(220, 20, 60, 0.2);
+transform: translateY(-2px);
+ }
+input::placeholder, textarea::placeholder {
+color: rgba(255, 255, 255, 0.4);
+ }
+/* Date input styling */
+input[type="date"] {
+cursor: pointer;
+position: relative;
+padding-right: 50px;
+color-scheme: dark;
+ }
+input[type="date"]::-webkit-calendar-picker-indicator {
+background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(220,20,60,0.8)"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>');
+background-size: 20px;
+cursor: pointer;
+width: 20px;
+height: 20px;
+position: absolute;
+right: 20px;
+filter: brightness(0) saturate(100%) invert(14%) sepia(93%) saturate(7426%) hue-rotate(347deg) brightness(90%) contrast(96%);
+ }
+/* Number input for percentage */
+input[type="number"] {
+position: relative;
+padding-right: 50px;
+ }
+.percentage-indicator {
+position: absolute;
+right: 20px;
+top: 50%;
+transform: translateY(-50%);
+color: rgba(220, 20, 60, 0.8);
+font-weight: 600;
+font-size: 1.1em;
+pointer-events: none;
+ }
+.percentage-field {
+position: relative;
+display: inline-block;
+width: 100%;
+ }
+/* Checkbox styling */
+.checkbox-group {
+display: flex;
+align-items: center;
+gap: 15px;
+padding: 20px 25px;
+background: rgba(255, 255, 255, 0.05);
+border: 2px solid rgba(220, 20, 60, 0.2);
+border-radius: 15px;
+backdrop-filter: blur(10px);
+transition: all 0.3s ease;
+ }
+.checkbox-group:hover {
+border-color: rgba(220, 20, 60, 0.4);
+background: rgba(220, 20, 60, 0.05);
+ }
+input[type="checkbox"] {
+width: 22px;
+height: 22px;
+accent-color: #DC143C;
+cursor: pointer;
+margin: 0;
+ }
+.checkbox-group label {
+margin: 0;
+cursor: pointer;
+text-transform: none;
+letter-spacing: normal;
+font-size: 1em;
+ }
+/* Input validation styles */
+.field-group.error input {
+border-color: #ef4444;
+background: rgba(239, 68, 68, 0.1);
+animation: shake 0.3s ease-in-out;
+ }
+.field-group.success input {
+border-color: #22c55e;
+background: rgba(34, 197, 94, 0.1);
+ }
+.error-text {
+color: #ef4444;
+font-size: 0.9em;
+margin-top: 5px;
+display: none;
+font-weight: 500;
+ }
+.field-group.error .error-text {
+display: block;
+ }
+@keyframes shake {
+ 0%, 100% { transform: translateX(0); }
+ 25% { transform: translateX(-5px); }
+ 75% { transform: translateX(5px); }
+ }
+/* Generate button styling */
+.generate-btn {
+margin-top: 10px;
+padding: 8px 15px;
+background: rgba(220, 20, 60, 0.2);
+color: white;
+border: 1px solid rgba(220, 20, 60, 0.3);
+border-radius: 10px;
+cursor: pointer;
+font-size: 0.9em;
+transition: all 0.3s ease;
+ }
+.generate-btn:hover {
+background: rgba(220, 20, 60, 0.3);
+transform: translateY(-2px);
+ }
+/* Send Button */
+.send-button {
+width: 100%;
+padding: 20px 50px;
+background: linear-gradient(45deg, #DC143C, #FF6B6B);
+color: white;
+border: none;
+border-radius: 25px;
+font-size: 1.2em;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.3s ease;
+text-transform: uppercase;
+letter-spacing: 1px;
+margin-top: 30px;
+position: relative;
+overflow: hidden;
+ }
+.send-button::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+transition: left 0.5s ease;
+ }
+.send-button:hover::before {
+left: 100%;
+ }
+.send-button:hover {
+transform: translateY(-3px) scale(1.02);
+box-shadow: 0 15px 35px rgba(220, 20, 60, 0.4);
+ }
+.send-button:active {
+transform: translateY(-1px) scale(0.98);
+ }
+.send-button:disabled {
+opacity: 0.7;
+cursor: not-allowed;
+transform: none;
+ }
+/* Success/Error messages */
+.success-message {
+background: rgba(34, 197, 94, 0.1);
+border: 2px solid rgba(34, 197, 94, 0.3);
+color: #22c55e;
+padding: 15px 25px;
+border-radius: 15px;
+margin-bottom: 25px;
+backdrop-filter: blur(10px);
+display: none;
+animation: slideInDown 0.5s ease;
+ }
+.error-message {
+background: rgba(239, 68, 68, 0.1);
+border: 2px solid rgba(239, 68, 68, 0.3);
+color: #ef4444;
+padding: 15px 25px;
+border-radius: 15px;
+margin-bottom: 25px;
+backdrop-filter: blur(10px);
+display: none;
+animation: slideInDown 0.5s ease;
+ }
+@keyframes slideInDown {
+ from {
+opacity: 0;
+transform: translateY(-20px);
+ }
+ to {
+opacity: 1;
+transform: translateY(0);
+ }
+ }
+/* Responsive design */
+@media (max-width: 768px) {
+.navbar {
+flex-direction: column;
+gap: 20px;
+padding: 20px;
+ }
+.nav-links {
+flex-direction: column;
+gap: 10px;
+ }
+.header-content h1 {
+font-size: 2.2em;
+ }
+.form-content {
+padding: 40px 30px;
+ }
+.form-section {
+padding: 20px;
+ }
+.icon-display {
+width: 80px;
+height: 80px;
+font-size: 2em;
+ }
+ }
+/* Animation for form elements */
+@keyframes slideInUp {
+ from {
+opacity: 0;
+transform: translateY(30px);
+ }
+ to {
+opacity: 1;
+transform: translateY(0);
+ }
+ }
+.field-group {
+animation: slideInUp 0.6s ease forwards;
+ }
+.field-group:nth-child(1) { animation-delay: 0.1s; }
+.field-group:nth-child(2) { animation-delay: 0.2s; }
+.field-group:nth-child(3) { animation-delay: 0.3s; }
+.field-group:nth-child(4) { animation-delay: 0.4s; }
+.field-group:nth-child(5) { animation-delay: 0.5s; }
+.field-group:nth-child(6) { animation-delay: 0.6s; }
+.field-group:nth-child(7) { animation-delay: 0.7s; }
+.promotion-icon {
+animation: slideInUp 0.6s ease forwards;
+animation-delay: 0.05s;
+ }
+</style>
 </head>
 <body>
-    <!-- Animated background -->
-    <div class="bg-decoration">
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-    </div>
+<!-- Animated background -->
+<div class="bg-decoration">
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
+</div>
+<!-- Navbar -->
+<div class="navbar">
+<div class="logo">⚙️ Admin Panel</div>
+<div class="nav-links">
+<a href="{% url 'admin_home' %}" class="back-btn">← Back to Dashboard</a>
+<a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+</div>
+</div>
+<!-- Header Section -->
+<div class="header-section">
+<div class="header-content">
+<h1>📢 Create Promotion</h1>
+<p>Engage your customers with compelling promotional campaigns and special offers to boost sales and visibility.</p>
+</div>
+</div>
+<!-- Form Section -->
+<div class="form-section">
+<div class="form-container">
+<div class="form-content">
+<!-- Promotion Icon -->
+<div class="promotion-icon">
+<div class="icon-display">📢</div>
+<div class="icon-subtitle">Promotional Campaign</div>
+</div>
+<form id="promotionForm" method="post">
+{% csrf_token %}
+<!-- Success/Error Messages -->
+<div class="success-message" id="successMessage">
+ ✅ Promotion created successfully!
+</div>
+<div class="error-message" id="errorMessage">
+ ❌ Please check the form for errors.
+</div>
+<!-- Promo Code Field -->
+<div class="field-group" id="promoCodeGroup">
+<label for="promoCode">Promo Code *</label>
+<input type="text" id="promoCode" name="promo_code" placeholder="Enter unique promo code" required>
+<button type="button" class="generate-btn" id="generatePromoBtn">🎲 Generate Random Code</button>
+<div class="error-text">Promo code must be at least 3 characters and unique</div>
+</div>
+<!-- Percentage Field -->
+<div class="field-group" id="percentageGroup">
+<label for="percentage">Discount Percentage *</label>
+<div class="percentage-field">
+<input type="number" id="percentage" name="percentage" placeholder="Enter discount percentage" min="1" max="100" required>
+<span class="percentage-indicator">%</span>
+</div>
+<div class="error-text">Percentage must be between 1 and 100</div>
+</div>
+<!-- Start Date Field -->
+<div class="field-group" id="startDateGroup">
+<label for="startDate">Start Date *</label>
+<input type="date" id="startDate" name="start_date" required>
+<div class="error-text">Please select a valid start date</div>
+</div>
+<!-- Expiration Date Field -->
+<div class="field-group" id="expirationDateGroup">
+<label for="expirationDate">Expiration Date *</label>
+<input type="date" id="expirationDate" name="expiration_date" required>
+<div class="error-text">Expiration date must be after start date</div>
+</div>
+<!-- Active Checkbox -->
+<!-- Removed: Always active by default -->
+<input type="hidden" id="isActive" name="is_active" value="true">
+<button type="submit" class="send-button" id="submitBtn">
+ 🚀 Create Promotion
+</button>
+</form>
+</div>
+</div>
+</div>
+<script>
+// Simulated database of existing promo codes with their active status (in a real app, this would come from the server)
+// This will be replaced with actual AJAX calls to Django backend
+let existingPromoCodes = [];
+// Get form elements
+const form = document.getElementById('promotionForm');
+const promoCodeInput = document.getElementById('promoCode');
+const percentageInput = document.getElementById('percentage');
+const startDateInput = document.getElementById('startDate');
+const expirationDateInput = document.getElementById('expirationDate');
+const isActiveInput = document.getElementById('isActive');
+const submitBtn = document.getElementById('submitBtn');
+const generatePromoBtn = document.getElementById('generatePromoBtn');
+// Set minimum dates to today
+const today = new Date().toISOString().split('T')[0];
+startDateInput.min = today;
+expirationDateInput.min = today;
+// Generate random promo code
+generatePromoBtn.addEventListener('click', function() {
+let randomCode;
+let attempts = 0;
+// Generate unique code (avoid duplicates with active promos only)
+do {
+randomCode = 'PROMO' + Math.random().toString(36).substr(2, 6).toUpperCase();
+attempts++;
+ } while (isPromoCodeTaken(randomCode) && attempts < 10);
+promoCodeInput.value = randomCode;
+validateField(promoCodeInput, 'promoCodeGroup');
+ });
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <div class="logo">⚙️ Admin Panel</div>
-        <div class="nav-links">
-            <a href="{% url 'admin_home' %}" class="back-btn">← Back to Dashboard</a>
-            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
-        </div>
-    </div>
+// Function to check if promo code is taken (only checks active promos)
+function isPromoCodeTaken(code) {
+// This will be replaced with AJAX call to Django backend
+return existingPromoCodes.some(promo => promo.code === code && promo.active === true);
+}
 
-    <!-- Header Section -->
-    <div class="header-section">
-        <div class="header-content">
-            <h1>📢 Create Promotion</h1>
-            <p>Engage your customers with compelling promotional campaigns and special offers to boost sales and visibility.</p>
-        </div>
-    </div>
+// Function to check promo code availability via AJAX
+function checkPromoCodeAvailability(code) {
+return fetch(`/admin/check-promo-code/?code=${encodeURIComponent(code)}`, {
+method: 'GET',
+headers: {
+'X-Requested-With': 'XMLHttpRequest',
+}
+})
+.then(response => response.json())
+.then(data => {
+return !data.available; // Return true if taken
+})
+.catch(error => {
+console.error('Error checking promo code:', error);
+return false; // Assume available on error
+});
+}
+// Percentage validation with real-time formatting
+percentageInput.addEventListener('input', function() {
+let value = this.value;
+// Remove any non-numeric characters
+value = value.replace(/[^0-9]/g, '');
+// Convert to number and validate range
+let numValue = parseInt(value) || 0;
+if (numValue < 1) {
+numValue = '';
+ } else if (numValue > 100) {
+numValue = 100;
+ }
+this.value = numValue;
+validateField(this, 'percentageGroup');
+ });
+// Prevent non-numeric input for percentage
+percentageInput.addEventListener('keydown', function(e) {
+// Allow: backspace, delete, tab, escape, enter, and arrow keys
+if ([8, 9, 27, 13, 37, 38, 39, 40, 46].includes(e.keyCode) ||
+// Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+(e.ctrlKey && [65, 67, 86, 88].includes(e.keyCode))) {
+return;
+ }
+// Ensure that it is a number
+if ((e.keyCode < 48 || e.keyCode > 57) && (e.keyCode < 96 || e.keyCode > 105)) {
+e.preventDefault();
+ }
+ });
+// Date validation with enhanced logic
+startDateInput.addEventListener('change', function() {
+const startDate = new Date(this.value);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+// Validate start date is not in the past
+if (startDate < today) {
+showError(this, 'startDateGroup', 'Start date cannot be in the past');
+return;
+ }
+// Update minimum expiration date
+expirationDateInput.min = this.value;
+// Clear expiration date if it's now invalid
+if (expirationDateInput.value && new Date(expirationDateInput.value) <= startDate) {
+expirationDateInput.value = '';
+showError(expirationDateInput, 'expirationDateGroup', 'Please select a new expiration date');
+ } else if (expirationDateInput.value) {
+validateField(expirationDateInput, 'expirationDateGroup');
+ }
+validateField(this, 'startDateGroup');
+ });
+expirationDateInput.addEventListener('change', function() {
+if (!startDateInput.value) {
+showError(this, 'expirationDateGroup', 'Please select start date first');
+this.value = '';
+return;
+ }
+const startDate = new Date(startDateInput.value);
+const expirationDate = new Date(this.value);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+// Validate expiration date is not in the past
+if (expirationDate < today) {
+showError(this, 'expirationDateGroup', 'Expiration date cannot be in the past');
+this.value = '';
+return;
+ }
+// Validate expiration date is after start date
+if (expirationDate <= startDate) {
+showError(this, 'expirationDateGroup', 'Expiration date must be after start date');
+this.value = '';
+return;
+ }
+validateField(this, 'expirationDateGroup');
+ });
+// Promo code validation with uniqueness check
+promoCodeInput.addEventListener('input', function() {
+// Convert to uppercase for consistency
+this.value = this.value.toUpperCase();
+validateField(this, 'promoCodeGroup');
+ });
 
-    <!-- Form Section -->
-    <div class="form-section">
-        <div class="form-container">
-            <div class="form-content">
-                <!-- Promotion Icon -->
-                <div class="promotion-icon">
-                    <div class="icon-display">📢</div>
-                    <div class="icon-subtitle">Promotional Campaign</div>
-                </div>
-
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <!-- Success/Error Messages -->
-                    <div class="success-message" id="successMessage">
-                        ✅ Promotion created successfully!
-                    </div>
-                    <div class="error-message" id="errorMessage">
-                        ❌ Please check the form for errors.
-                    </div>
-
-                    <!-- Promotion form fields based on Django model -->
-                    <div class="field-group">
-                        <label for="{{ form.promo_code.id_for_label }}">Promo Code *</label>
-                        {{ form.promo_code }}
-                    </div>
-
-                    <div class="field-group">
-                        <label for="{{ form.percentage.id_for_label }}">Discount Percentage *</label>
-                        {{ form.percentage }}
-                    </div>
-
-                    <div class="field-group">
-                        <label for="{{ form.start_date.id_for_label }}">Start Date *</label>
-                        {{ form.start_date }}
-                    </div>
-
-                    <div class="field-group">
-                        <label for="{{ form.expiration_date.id_for_label }}">Expiration Date *</label>
-                        {{ form.expiration_date }}
-                    </div>
-
-                    <div class="field-group">
-                        <div class="checkbox-group">
-                            {{ form.is_active }}
-                            <label for="{{ form.is_active.id_for_label }}">Active Promotion</label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="send-button">
-                        🚀 Send Promotion
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Form validation and enhancement
-        const form = document.querySelector('form');
-        const inputs = document.querySelectorAll('input, select, textarea');
-
-        // Add floating label effect
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-            });
-
-            input.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.parentElement.classList.remove('focused');
-                }
-            });
-
-            // Check if field has value on load
-            if (input.value) {
-                input.parentElement.classList.add('focused');
-            }
-        });
-
-        // Form submission enhancement
-        form.addEventListener('submit', function(e) {
-            const sendButton = document.querySelector('.send-button');
-            const originalText = sendButton.innerHTML;
-            
-            sendButton.innerHTML = '⏳ Sending Promotion...';
-            sendButton.disabled = true;
-            
-            // Re-enable button after 3 seconds (for demo purposes)
-            setTimeout(() => {
-                sendButton.innerHTML = originalText;
-                sendButton.disabled = false;
-            }, 3000);
-        });
-
-        // Date validation for promotion dates
-        const startDateInput = document.querySelector('input[type="date"]');
-        const endDateInput = document.querySelectorAll('input[type="date"]')[1];
-
-        if (startDateInput && endDateInput) {
-            startDateInput.addEventListener('change', function() {
-                endDateInput.min = this.value;
-            });
-
-            endDateInput.addEventListener('change', function() {
-                if (this.value < startDateInput.value) {
-                    alert('Expiration date cannot be before start date');
-                    this.value = '';
-                }
-            });
-        }
-
-        // Percentage validation (0-100)
-        const percentageInput = document.querySelector('input[type="number"]');
-        if (percentageInput) {
-            percentageInput.addEventListener('input', function() {
-                const value = parseFloat(this.value);
-                if (value < 0) {
-                    this.value = 0;
-                } else if (value > 100) {
-                    this.value = 100;
-                }
-            });
-        }
-
-        // Add intersection observer for scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe form elements
-        document.querySelectorAll('.field-group, .promotion-icon').forEach(field => {
-            field.style.opacity = '0';
-            field.style.transform = 'translateY(30px)';
-            field.style.transition = 'all 0.6s ease';
-            observer.observe(field);
-        });
-
-        // Remove promotion type handling since it's not in the model
-        // Promo code generation helper
-        const promoCodeInput = document.querySelector('input[name*="promo_code"]');
-        if (promoCodeInput) {
-            // Add button to generate random promo code
-            const generateBtn = document.createElement('button');
-            generateBtn.type = 'button';
-            generateBtn.innerHTML = '🎲 Generate Code';
-            generateBtn.style.cssText = `
-                margin-top: 10px;
-                padding: 8px 15px;
-                background: rgba(220, 20, 60, 0.2);
-                color: white;
-                border: 1px solid rgba(220, 20, 60, 0.3);
-                border-radius: 10px;
-                cursor: pointer;
-                font-size: 0.9em;
-                transition: all 0.3s ease;
-            `;
-            
-            generateBtn.addEventListener('click', function() {
-                const randomCode = 'PROMO' + Math.random().toString(36).substr(2, 6).toUpperCase();
-                promoCodeInput.value = randomCode;
-                promoCodeInput.dispatchEvent(new Event('input'));
-            });
-            
-            generateBtn.addEventListener('mouseenter', function() {
-                this.style.background = 'rgba(220, 20, 60, 0.3)';
-                this.style.transform = 'translateY(-2px)';
-            });
-            
-            generateBtn.addEventListener('mouseleave', function() {
-                this.style.background = 'rgba(220, 20, 60, 0.2)';
-                this.style.transform = 'translateY(0)';
-            });
-            
-            promoCodeInput.parentElement.appendChild(generateBtn);
-        }
-    </script>
+// Real-time validation as user types with debouncing
+let promoCheckTimeout;
+promoCodeInput.addEventListener('blur', function() {
+const code = this.value.trim();
+if (code.length >= 3) {
+clearTimeout(promoCheckTimeout);
+promoCheckTimeout = setTimeout(() => {
+checkPromoCodeAvailability(code).then(isTaken => {
+if (isTaken) {
+showError(this, 'promoCodeGroup', 'This promo code is already active. Please choose a different one.');
+} else {
+validateField(this, 'promoCodeGroup');
+}
+});
+}, 500); // 500ms delay
+}
+ });
+// Validation functions
+function validateField(input, groupId) {
+const group = document.getElementById(groupId);
+const value = input.value.trim();
+let isValid = true;
+let errorMessage = '';
+switch(input.id) {
+case 'promoCode':
+if (value.length < 3) {
+isValid = false;
+errorMessage = 'Promo code must be at least 3 characters';
+ } else if (!/^[A-Z0-9]+$/.test(value)) {
+isValid = false;
+errorMessage = 'Promo code can only contain letters and numbers';
+ }
+// Note: Uniqueness check is handled separately via AJAX
+break;
+case 'percentage':
+const numValue = parseInt(value);
+if (isNaN(numValue) || numValue < 1 || numValue > 100) {
+isValid = false;
+errorMessage = 'Percentage must be between 1 and 100';
+ }
+break;
+case 'startDate':
+if (!value) {
+isValid = false;
+errorMessage = 'Please select a start date';
+ } else {
+const selectedDate = new Date(value);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+if (selectedDate < today) {
+isValid = false;
+errorMessage = 'Start date cannot be in the past';
+ }
+ }
+break;
+case 'expirationDate':
+if (!value) {
+isValid = false;
+errorMessage = 'Please select an expiration date';
+ } else if (!startDateInput.value) {
+isValid = false;
+errorMessage = 'Please select start date first';
+ } else {
+const startDate = new Date(startDateInput.value);
+const expirationDate = new Date(value);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+if (expirationDate < today) {
+isValid = false;
+errorMessage = 'Expiration date cannot be in the past';
+ } else if (expirationDate <= startDate) {
+isValid = false;
+errorMessage = 'Expiration date must be after start date';
+ }
+ }
+break;
+ }
+if (isValid) {
+group.classList.remove('error');
+group.classList.add('success');
+ } else {
+showError(input, groupId, errorMessage);
+ }
+return isValid;
+ }
+function showError(input, groupId, message) {
+const group = document.getElementById(groupId);
+const errorText = group.querySelector('.error-text');
+group.classList.remove('success');
+group.classList.add('error');
+if (message) {
+errorText.textContent = message;
+ }
+ }
+// Form submission with comprehensive validation
+form.addEventListener('submit', function(e) {
+e.preventDefault();
+// Hide previous messages
+document.getElementById('successMessage').style.display = 'none';
+document.getElementById('errorMessage').style.display = 'none';
+// Validate all fields
+const isPromoValid = validateField(promoCodeInput, 'promoCodeGroup');
+const isPercentageValid = validateField(percentageInput, 'percentageGroup');
+const isStartDateValid = validateField(startDateInput, 'startDateGroup');
+const isExpirationDateValid = validateField(expirationDateInput, 'expirationDateGroup');
+// Check if all validations pass
+if (isPromoValid && isPercentageValid && isStartDateValid && isExpirationDateValid) {
+// Show loading state
+submitBtn.innerHTML = '⏳ Creating Promotion...';
+submitBtn.disabled = true;
+// Collect form data
+const formData = new FormData(form);
+// Submit via AJAX
+fetch(window.location.href, {
+method: 'POST',
+headers: {
+'X-Requested-With': 'XMLHttpRequest',
+'X-CSRFToken': getCookie('csrftoken')
+},
+body: formData
+})
+.then(response => response.json())
+.then(data => {
+if (data.success) {
+// Show success message
+document.getElementById('successMessage').style.display = 'block';
+document.getElementById('successMessage').innerHTML = 
+`✅ ${data.message}`;
+// Reset form
+form.reset();
+// Clear validation states
+document.querySelectorAll('.field-group').forEach(group => {
+group.classList.remove('error', 'success');
+});
+// Reset date minimums
+const newToday = new Date().toISOString().split('T')[0];
+startDateInput.min = newToday;
+expirationDateInput.min = newToday;
+// Scroll to success message
+document.getElementById('successMessage').scrollIntoView({ 
+behavior: 'smooth', 
+block: 'center' 
+});
+} else {
+// Show error messages
+if (data.errors && data.errors.length > 0) {
+const errorMsg = data.errors.join('<br>');
+document.getElementById('errorMessage').innerHTML = `❌ ${errorMsg}`;
+document.getElementById('errorMessage').style.display = 'block';
+} else {
+document.getElementById('errorMessage').style.display = 'block';
+}
+}
+})
+.catch(error => {
+console.error('Error:', error);
+document.getElementById('errorMessage').innerHTML = '❌ An error occurred while creating the promotion. Please try again.';
+document.getElementById('errorMessage').style.display = 'block';
+})
+.finally(() => {
+// Reset button
+submitBtn.innerHTML = '🚀 Create Promotion';
+submitBtn.disabled = false;
+});
+ } else {
+// Show error message
+document.getElementById('errorMessage').style.display = 'block';
+// Scroll to first error
+const firstError = document.querySelector('.field-group.error');
+if (firstError) {
+firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+ }
+ }
+ });
+// Add floating label effect
+const inputs = document.querySelectorAll('input, select, textarea');
+inputs.forEach(input => {
+input.addEventListener('focus', function() {
+this.parentElement.classList.add('focused');
+ });
+input.addEventListener('blur', function() {
+if (!this.value) {
+this.parentElement.classList.remove('focused');
+ }
+ });
+// Check if field has value on load
+if (input.value) {
+input.parentElement.classList.add('focused');
+ }
+ });
+// Add intersection observer for scroll animations
+const observerOptions = {
+threshold: 0.1,
+rootMargin: '0px 0px -50px 0px'
+ };
+const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.style.opacity = '1';
+entry.target.style.transform = 'translateY(0)';
+ }
+ });
+ }, observerOptions);
+// Observe form elements for scroll animations
+document.querySelectorAll('.field-group, .promotion-icon').forEach(field => {
+field.style.opacity = '0';
+field.style.transform = 'translateY(30px)';
+field.style.transition = 'all 0.6s ease';
+observer.observe(field);
+ });
+// Helper function to get CSRF token for Django (if needed)
+function getCookie(name) {
+let cookieValue = null;
+if (document.cookie && document.cookie !== '') {
+const cookies = document.cookie.split(';');
+for (let i = 0; i < cookies.length; i++) {
+const cookie = cookies[i].trim();
+if (cookie.substring(0, name.length + 1) === (name + '=')) {
+cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+break;
+ }
+ }
+ }
+return cookieValue;
+ }
+// Additional validation for edge cases
+function validatePromotionDates() {
+const startDate = new Date(startDateInput.value);
+const expirationDate = new Date(expirationDateInput.value);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+// Additional business logic validation
+const maxPromotionDuration = 365; // 1 year max
+const daysDifference = Math.ceil((expirationDate - startDate) / (1000 * 60 * 60 * 24));
+if (daysDifference > maxPromotionDuration) {
+showError(expirationDateInput, 'expirationDateGroup', 
+ 'Promotion duration cannot exceed 365 days');
+return false;
+ }
+if (daysDifference < 1) {
+showError(expirationDateInput, 'expirationDateGroup', 
+ 'Promotion must last at least 1 day');
+return false;
+ }
+return true;
+ }
+// Enhanced promo code generator with better uniqueness
+function generateUniquePromoCode() {
+const prefixes = ['SAVE', 'DEAL', 'OFFER', 'PROMO', 'SALE'];
+const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+const numbers = Math.floor(Math.random() * 900) + 100; // 3-digit number
+const letters = Math.random().toString(36).substr(2, 2).toUpperCase();
+return prefix + numbers + letters;
+ }
+// Update the generate button to use better algorithm
+generatePromoBtn.addEventListener('click', function() {
+let randomCode;
+let attempts = 0;
+const generateCode = async () => {
+do {
+randomCode = generateUniquePromoCode();
+attempts++;
+const isTaken = await checkPromoCodeAvailability(randomCode);
+if (!isTaken) break;
+ } while (attempts < 20);
+if (attempts >= 20) {
+// Fallback to timestamp-based generation
+randomCode = 'PROMO' + Date.now().toString().slice(-6);
+ }
+promoCodeInput.value = randomCode;
+validateField(promoCodeInput, 'promoCodeGroup');
+ };
+generateCode();
+ });
+// Prevent form submission on Enter key in input fields (except submit button)
+document.addEventListener('keydown', function(e) {
+if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'submit') {
+e.preventDefault();
+// Move to next field or validate current field
+const inputs = Array.from(document.querySelectorAll('input, select, textarea'));
+const currentIndex = inputs.indexOf(e.target);
+if (currentIndex < inputs.length - 1) {
+inputs[currentIndex + 1].focus();
+ }
+ }
+ });
+// Auto-save draft functionality (optional)
+let draftTimer;
+function saveDraft() {
+const draftData = {
+promo_code: promoCodeInput.value,
+percentage: percentageInput.value,
+start_date: startDateInput.value,
+expiration_date: expirationDateInput.value,
+is_active: true, // Always active
+timestamp: Date.now()
+ };
+ 
+// Save to browser memory (in a real app, you might save to server)
+sessionStorage.setItem('promotion_draft', JSON.stringify(draftData));
+ }
+// Load draft on page load
+function loadDraft() {
+const savedDraft = sessionStorage.getItem('promotion_draft');
+if (savedDraft) {
+const draftData = JSON.parse(savedDraft);
+// Only load if draft is less than 1 hour old
+if (Date.now() - draftData.timestamp < 3600000) {
+promoCodeInput.value = draftData.promo_code || '';
+percentageInput.value = draftData.percentage || '';
+startDateInput.value = draftData.start_date || '';
+expirationDateInput.value = draftData.expiration_date || '';
+// is_active is always true, no need to load
+ }
+ }
+ }
+// Auto-save draft every 30 seconds
+inputs.forEach(input => {
+input.addEventListener('input', function() {
+clearTimeout(draftTimer);
+draftTimer = setTimeout(saveDraft, 2000); // Save 2 seconds after user stops typing
+ });
+ });
+// Load draft when page loads
+document.addEventListener('DOMContentLoaded', loadDraft);
+// Clear draft when form is successfully submitted
+form.addEventListener('submit', function() {
+sessionStorage.removeItem('promotion_draft');
+ });
+</script>
 </body>
 </html>

@@ -212,7 +212,7 @@
     color: #FF6B6B;
 }
 
-/* Messages styling */
+/* Messages styling - Updated to handle different message types */
 .messages {
     list-style: none;
     padding: 0;
@@ -220,15 +220,39 @@
 }
 
 .messages li {
-    background: rgba(220, 20, 60, 0.1);
-    border: 1px solid rgba(220, 20, 60, 0.3);
-    color: #FF6B6B;
     padding: 12px 20px;
     border-radius: 20px;
     margin-bottom: 10px;
     font-size: 0.9em;
     backdrop-filter: blur(10px);
     animation: slideIn 0.3s ease;
+    border: 1px solid;
+}
+
+/* Different styles for different message types */
+.messages li.error,
+.messages li.login {
+    background: rgba(220, 20, 60, 0.1);
+    border-color: rgba(220, 20, 60, 0.3);
+    color: #FF6B6B;
+}
+
+.messages li.success {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.messages li.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+}
+
+.messages li.info {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
 }
 
 @keyframes slideIn {
@@ -418,13 +442,17 @@
 <main class="auth-page">
     <div class="auth-box">
         <h2>Login</h2>
-      {% if messages %}
-<ul class="messages">
-  {% for message in messages %}
-    <li class="{{ message.tags }}">{{ message }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
+        
+        <!-- Only show authentication-related messages -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                {% if 'auth' in message.tags %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        {% endif %}
 
         <form method="POST">
             {% csrf_token %}

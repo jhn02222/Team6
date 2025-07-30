@@ -7,6 +7,128 @@
     {% load static %}
 
     <link rel="stylesheet" href="{% static 'store/bookstore.css' %}">
+    <style>
+        .book-card {
+            position: relative;
+        }
+
+        /* Beautiful stock bubble badges */
+        .stock-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(15px);
+            border: 2px solid;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            animation: stockBadgeFloat 3s ease-in-out infinite;
+        }
+
+        .stock-badge.available {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(16, 185, 129, 0.9));
+            border-color: rgba(34, 197, 94, 0.6);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .stock-badge.low {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9));
+            border-color: rgba(245, 158, 11, 0.6);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            animation: stockBadgeFloat 2s ease-in-out infinite, lowStockPulse 2s ease-in-out infinite;
+        }
+
+        .stock-badge.out {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
+            border-color: rgba(239, 68, 68, 0.6);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            animation: stockBadgeFloat 2s ease-in-out infinite, outOfStockPulse 2s ease-in-out infinite;
+        }
+
+        /* Stock badge animations */
+        @keyframes stockBadgeFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-3px) scale(1.02); }
+        }
+
+        @keyframes lowStockPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(245, 158, 11, 0.6); }
+        }
+
+        @keyframes outOfStockPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(239, 68, 68, 0.6); }
+        }
+
+        /* Remove stock info from bottom since we have badges */
+        .stock-info {
+            display: none;
+        }
+
+        /* Out of stock card styling */
+        .book-card.out-of-stock {
+            opacity: 0.7;
+            filter: grayscale(20%);
+        }
+
+        .book-card.out-of-stock img {
+            opacity: 0.8;
+        }
+
+        .book-card.out-of-stock .book-info h4,
+        .book-card.out-of-stock .book-info .author {
+            opacity: 0.9;
+        }
+
+        /* No button area for out of stock items */
+        .no-button-placeholder {
+            height: 20px; /* Small space where button would be */
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.success {
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            border: 2px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .notification.error {
+            background: rgba(245, 158, 11, 0.9);
+            color: white;
+            border: 2px solid rgba(245, 158, 11, 0.5);
+        }
+
+        .notification.warning {
+            background: rgba(249, 115, 22, 0.9);
+            color: white;
+            border: 2px solid rgba(249, 115, 22, 0.5);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
 </head>
 <body>
     <!-- Animated background -->
@@ -54,7 +176,22 @@
         <h2>⭐ Featured Books</h2>
         <div class="book-grid">
             {% for book in featured_books %}
-                <div class="book-card">
+                <div class="book-card {% if book.quantity_in_stock == 0 %}out-of-stock{% endif %}">
+                    <!-- Stock Badge -->
+                    {% if book.quantity_in_stock == 0 %}
+                        <div class="stock-badge out">
+                            <span>📵 Out of Stock</span>
+                        </div>
+                    {% elif book.quantity_in_stock <= 5 %}
+                        <div class="stock-badge low">
+                            <span>⚠️ Only {{ book.quantity_in_stock }}</span>
+                        </div>
+                    {% elif book.quantity_in_stock <= 20 %}
+                        <div class="stock-badge available">
+                            <span>✅ {{ book.quantity_in_stock }} Available</span>
+                        </div>
+                    {% endif %}
+                    
                     <img src="{{ book.cover_image|default:'https://cdn-icons-png.flaticon.com/512/29/29302.png' }}" alt="{{ book.title }}">
                     <div class="book-info">
                         <h4><a href="{% url 'book_detail' book.id %}" style="color: inherit; text-decoration: none;">{{ book.title }}</a></h4>
@@ -77,7 +214,18 @@
                                 <span class="no-rating">No rating</span>
                             {% endif %}
                         </div>
-                        <button class="btn-primary add-to-cart-btn" data-book-id="{{ book.id }}">Add to Cart</button>
+                        
+                        <!-- Only show button if in stock -->
+                        {% if book.quantity_in_stock > 0 %}
+                            <button class="btn-primary add-to-cart-btn" 
+                                    data-book-id="{{ book.id }}"
+                                    data-book-title="{{ book.title }}"
+                                    data-stock="{{ book.quantity_in_stock }}">
+                                Add to Cart
+                            </button>
+                        {% else %}
+                            <div class="no-button-placeholder"></div>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
@@ -120,55 +268,250 @@
     </div>
 
     <script>
+        function showNotification(message, type = 'success') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(n => n.remove());
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Trigger show animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        function getCsrfToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                    return value;
+                }
+            }
+            return '';
+        }
+
+        function updateBookStock(bookId, newStock) {
+            const bookCard = document.querySelector(`[data-book-id="${bookId}"]`).closest('.book-card');
+            const addButton = bookCard.querySelector('.add-to-cart-btn');
+            let stockBadge = bookCard.querySelector('.stock-badge');
+
+            // Remove existing stock badge if present
+            if (stockBadge) {
+                stockBadge.remove();
+            }
+
+            // Create new stock badge based on stock level
+            if (newStock === 0) {
+                // Out of stock
+                stockBadge = document.createElement('div');
+                stockBadge.className = 'stock-badge out';
+                stockBadge.innerHTML = '<span>📵 Out of Stock</span>';
+                bookCard.appendChild(stockBadge);
+                
+                // Add out-of-stock styling to card
+                bookCard.classList.add('out-of-stock');
+                
+                // Remove button completely and add placeholder
+                if (addButton) {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'no-button-placeholder';
+                    addButton.parentNode.replaceChild(placeholder, addButton);
+                }
+            } else if (newStock <= 5) {
+                // Low stock
+                stockBadge = document.createElement('div');
+                stockBadge.className = 'stock-badge low';
+                stockBadge.innerHTML = `<span>⚠️ Only ${newStock}</span>`;
+                bookCard.appendChild(stockBadge);
+                
+                // Remove out-of-stock styling
+                bookCard.classList.remove('out-of-stock');
+            } else if (newStock <= 20) {
+                // Available stock
+                stockBadge = document.createElement('div');
+                stockBadge.className = 'stock-badge available';
+                stockBadge.innerHTML = `<span>✅ ${newStock} Available</span>`;
+                bookCard.appendChild(stockBadge);
+                
+                // Remove out-of-stock styling
+                bookCard.classList.remove('out-of-stock');
+            } else {
+                // High stock - no badge needed
+                bookCard.classList.remove('out-of-stock');
+            }
+
+            // Update data attribute if button still exists
+            if (addButton && !bookCard.classList.contains('out-of-stock')) {
+                addButton.setAttribute('data-stock', newStock);
+            }
+        }
+
         // Add to cart functionality
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const bookId = this.dataset.bookId;
+                    const bookTitle = this.dataset.bookTitle;
+                    const currentStock = parseInt(this.dataset.stock);
+                    
+                    // Pre-check stock
+                    if (currentStock <= 0) {
+                        showNotification(`"${bookTitle}" is currently out of stock.`, 'error');
+                        return;
+                    }
                     
                     // Show loading state
+                    const originalText = this.textContent;
                     this.textContent = 'Adding...';
                     this.disabled = true;
                     
-                    // AJAX call to add to cart
-                    fetch(`/store/cart/ajax-add/${bookId}/`, {
-                        method: 'POST',
+                    // First check cart availability
+                    fetch(`/store/cart/check-availability/${bookId}/`, {
+                        method: 'GET',
                         headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
                     .then(res => res.json())
+                    .then(checkData => {
+                        if (!checkData.success) {
+                            throw new Error(checkData.message || 'Failed to check availability');
+                        }
+                        
+                        const currentInCart = checkData.current_in_cart || 0;
+                        const availableStock = checkData.available_stock || 0;
+                        const canAdd = checkData.can_add_more || false;
+                        
+                        // Check if we can add more to cart
+                        if (!canAdd) {
+                            this.textContent = originalText;
+                            this.disabled = false;
+                            
+                            if (currentInCart > 0) {
+                                if (availableStock === 0) {
+                                    showNotification(
+                                        `"${bookTitle}" is out of stock. You have ${currentInCart} in your cart.`, 
+                                        'error'
+                                    );
+                                } else {
+                                    showNotification(
+                                        `You already have ${currentInCart} of "${bookTitle}" in your cart. Only ${availableStock} total available.`, 
+                                        'warning'
+                                    );
+                                }
+                            } else {
+                                showNotification(`"${bookTitle}" is currently out of stock.`, 'error');
+                            }
+                            return;
+                        }
+                        
+                        // Proceed with adding to cart
+                        return fetch(`/store/cart/ajax-add/${bookId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCsrfToken(),
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                    })
+                    .then(res => {
+                        if (!res) return null; // No need to process if we didn't make the add request
+                        return res.json();
+                    })
                     .then(data => {
+                        if (!data) return; // No data to process
+                        
                         if (data.success) {
-                            document.getElementById('cart-count').textContent = data.cart_count;
+                            // Update cart count
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.textContent = data.cart_count;
+                            }
+                            
+                            // Update button state
                             this.textContent = 'Added!';
                             this.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
                             
+                            // Update stock display
+                            if (data.remaining_stock !== undefined) {
+                                updateBookStock(bookId, data.remaining_stock);
+                            }
+                            
+                            const newCartQuantity = data.new_cart_quantity || 1;
+                            showNotification(
+                                `"${bookTitle}" added to cart! You now have ${newCartQuantity} in your cart.`, 
+                                'success'
+                            );
+                            
+                            // Reset button after 2 seconds (if not out of stock)
                             setTimeout(() => {
-                                this.textContent = 'Add to Cart';
-                                this.disabled = false;
-                                this.style.background = 'linear-gradient(45deg, #DC143C, #FF6B6B)';
-                            }, 1000);
+                                if (!this.disabled) {
+                                    this.textContent = originalText;
+                                    this.style.background = 'linear-gradient(45deg, #DC143C, #FF6B6B)';
+                                }
+                            }, 2000);
                         } else {
-                            this.textContent = 'Error';
-                            this.style.background = 'linear-gradient(45deg, #dc3545, #c82333)';
-                            setTimeout(() => {
-                                this.textContent = 'Add to Cart';
-                                this.disabled = false;
-                                this.style.background = 'linear-gradient(45deg, #DC143C, #FF6B6B)';
-                            }, 1000);
+                            // Handle specific error cases
+                            if (data.error === 'insufficient_stock') {
+                                const currentInCart = data.current_in_cart || 0;
+                                if (currentInCart > 0) {
+                                    showNotification(
+                                        `You have ${currentInCart} of "${bookTitle}" in cart. Only ${data.available_stock} total available.`, 
+                                        'warning'
+                                    );
+                                } else {
+                                    showNotification(
+                                        `Only ${data.available_stock} of "${bookTitle}" available.`, 
+                                        'warning'
+                                    );
+                                }
+                            } else if (data.error === 'out_of_stock') {
+                                showNotification(`"${bookTitle}" is now out of stock.`, 'error');
+                                updateBookStock(bookId, 0);
+                            } else if (data.error === 'already_at_max') {
+                                showNotification(
+                                    `You already have all available stock of "${bookTitle}" in your cart.`, 
+                                    'warning'
+                                );
+                            } else {
+                                showNotification(
+                                    data.message || `Could not add "${bookTitle}" to cart. Please try again.`, 
+                                    'error'
+                                );
+                            }
+                            
+                            // Reset button
+                            this.textContent = originalText;
+                            this.disabled = false;
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        this.textContent = 'Error';
+                        this.textContent = originalText;
                         this.disabled = false;
                         this.style.background = 'linear-gradient(45deg, #dc3545, #c82333)';
+                        showNotification('Network error. Please check your connection and try again.', 'error');
+                        
                         setTimeout(() => {
-                            this.textContent = 'Add to Cart';
                             this.style.background = 'linear-gradient(45deg, #DC143C, #FF6B6B)';
-                        }, 1000);
+                        }, 2000);
                     });
                 });
             });

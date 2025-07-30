@@ -23,4 +23,9 @@ urlpatterns = [
     path('promotions/', views.view_promotions, name='view_promotions'),
     path('apply-promo/', views.apply_promo, name='apply_promo'),
     path('clear-promo/', views.clear_promo, name='clear_promo'),
+     path('admin/create-promotion/', views.create_promotion, name='create_promotion'),
+    
+    # AJAX endpoint to check promo code availability
+    path('admin/check-promo-code/', views.check_promo_code_availability, name='check_promo_code'),
+    
 ]
