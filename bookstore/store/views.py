@@ -158,15 +158,18 @@ def cart_view(request):
             return redirect('cart_view')
 
     # Handle GET request or POST fallback
+    total = Decimal('0.00')  # ensures we start with a Decimal, not int
+
     if request.user.is_authenticated:
         cart_items = CartItem.objects.filter(user=request.user)
-        total = sum(item.book.selling_price * item.quantity for item in cart_items)
+        for item in cart_items:
+            total += Decimal(item.book.selling_price) * item.quantity
     else:
         session_cart = request.session.get('cart', {})
         for book_id_str, quantity in session_cart.items():
             try:
                 book = Book.objects.get(id=int(book_id_str))
-                subtotal = book.selling_price * quantity
+                subtotal = Decimal(book.selling_price) * quantity
                 total += subtotal
                 cart_items.append(type('SessionCartItem', (), {
                     'book': book,
@@ -176,12 +179,14 @@ def cart_view(request):
             except Book.DoesNotExist:
                 continue
 
+    total = total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     tax = (total * Decimal("0.07")).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     total_after_tax = (total + tax).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
+    
     return render(request, 'store/cart.html', {
         'cart_items': cart_items,
-        'total': total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
+        'total': total,
         'tax': tax,
         'total_after_tax': total_after_tax,
         'is_guest': not request.user.is_authenticated
